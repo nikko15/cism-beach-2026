@@ -1,572 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0b1f3a" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1f3a">
   <title>CISM EC Beach Volleyball 2026 – Live Results</title>
   <style>
     :root{
-      --bg:#f4f7fb;
-      --card:#ffffff;
-      --text:#132033;
-      --muted:#6b778c;
-      --primary:#0b1f3a;
-      --primary-2:#173d6b;
-      --accent:#d62f2f;
-      --line:#e4eaf2;
-      --shadow:0 10px 30px rgba(19,32,51,.08);
+      --card:#fff; --text:#132033; --muted:#6b778c; --primary:#0b1f3a;
+      --primary2:#173d6b; --line:#e4eaf2; --shadow:0 10px 30px rgba(19,32,51,.08);
       --radius:20px;
     }
-
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
-
-    body{
-      margin:0;
-      font-family:Inter,Segoe UI,Arial,sans-serif;
-      background:linear-gradient(180deg,#eef3f9 0%,#f8fafc 30%,#f4f7fb 100%);
-      color:var(--text);
-    }
-
+    body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f4f7fb;color:var(--text)}
     a{text-decoration:none;color:inherit}
-
-    .wrap{
-      width:min(1100px,calc(100% - 28px));
-      margin:0 auto;
-    }
-
-    .hero{
-      background:
-        radial-gradient(circle at top right,rgba(255,255,255,.16),transparent 34%),
-        linear-gradient(135deg,var(--primary) 0%,var(--primary-2) 100%);
-      color:#fff;
-      padding:28px 0 30px;
-      box-shadow:0 8px 30px rgba(11,31,58,.18);
-    }
-
-    .hero-inner{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:20px;
-    }
-
-    .eyebrow{
-      font-size:.78rem;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      opacity:.78;
-      font-weight:700;
-      margin-bottom:10px;
-    }
-
-    h1{
-      margin:0;
-      font-size:clamp(1.8rem,5vw,3rem);
-      line-height:1.05;
-    }
-
-    .subtitle{
-      margin-top:8px;
-      font-size:clamp(1rem,2.8vw,1.3rem);
-      opacity:.9;
-    }
-
-    .live-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:9px 13px;
-      border-radius:999px;
-      background:rgba(255,255,255,.12);
-      border:1px solid rgba(255,255,255,.22);
-      font-weight:700;
-      white-space:nowrap;
-    }
-
-    .dot{
-      width:9px;
-      height:9px;
-      border-radius:50%;
-      background:#ff4d4d;
-      box-shadow:0 0 0 6px rgba(255,77,77,.12);
-    }
-
-    .hero-note{
-      margin-top:18px;
-      font-size:.92rem;
-      opacity:.82;
-    }
-
+    .wrap{width:min(1100px,calc(100% - 28px));margin:auto}
+    .hero{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;padding:28px 0 30px}
+    .hero-inner{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+    .eyebrow{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;opacity:.78;font-weight:700;margin-bottom:10px}
+    h1{margin:0;font-size:clamp(1.8rem,5vw,3rem);line-height:1.05}
+    .subtitle{margin-top:8px;font-size:clamp(1rem,2.8vw,1.3rem);opacity:.9}
+    .live-badge{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:700}
+    .dot{width:9px;height:9px;border-radius:50%;background:#ff4d4d}
     main{padding:22px 0 48px}
-
     .section{margin-top:22px}
+    .section-title{font-size:1.1rem;font-weight:800;margin:0 0 12px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .action{min-height:115px;display:flex;flex-direction:column;justify-content:space-between}
+    .action .icon{font-size:1.6rem}.action h3{margin:9px 0 3px}.action p{margin:0;color:var(--muted);font-size:.87rem}
+    .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px}
+    .updated{color:var(--muted);font-size:.82rem}
+    .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .filter-btn{border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:999px;font-weight:700;cursor:pointer}
+    .filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .schedule-list,.pools{display:grid;gap:10px}
+    .match-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fbfcfe}
+    .match-top{display:flex;justify-content:space-between;gap:12px;margin-bottom:9px}
+    .time-court{font-weight:800;color:var(--primary)} .gender{font-size:.75rem;font-weight:800;background:#e9eef6;padding:5px 8px;border-radius:999px}
+    .match-name{color:var(--muted);font-size:.82rem;margin-bottom:8px}
+    .teams{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;font-weight:800}
+    .team2{text-align:right}.score{min-width:58px;text-align:center;background:var(--primary);color:#fff;padding:8px;border-radius:10px}.score.empty{background:#e9eef6;color:#6d7a8f}
 
-    .section-head{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:12px;
-    }
+    .division-title{font-size:1.45rem;margin:0 0 14px}
+    .pool-card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+    .pool-title{background:var(--primary);color:#fff;padding:12px 15px;font-weight:800;font-size:1.05rem}
+    .standing-head,.standing-row{display:grid;grid-template-columns:42px minmax(180px,2fr) 58px 80px 100px 120px;align-items:center}
+    .standing-head{background:#eef2f7;color:#526177;font-size:.73rem;font-weight:800;text-transform:uppercase}
+    .standing-head>div,.standing-row>div{padding:9px 10px}
+    .standing-row{border-top:1px solid var(--line);font-size:.9rem}
+    .standing-row:first-of-type{border-top:none}
+    .rank{font-weight:900;text-align:center}
+    .team-name{font-weight:800}.country{color:var(--muted);font-size:.76rem;margin-top:2px}
+    .pts{font-weight:900;font-size:1rem;text-align:center}
+    .metric{text-align:center}.metric small{display:block;color:var(--muted);font-size:.68rem;margin-top:2px}
+    .mobile-label{display:none}
+    .empty-state,.loading,.error-state{text-align:center;color:var(--muted);padding:18px}
+    .error-state{background:#fff2f2;border:1px solid #f0caca;border-radius:14px;color:#8a2c2c}
+    .footer{text-align:center;color:var(--muted);font-size:.82rem;margin-top:28px}
 
-    .section-title{
-      font-size:1.1rem;
-      font-weight:800;
-      margin:0;
-    }
-
-    .updated{
-      color:var(--muted);
-      font-size:.82rem;
-      text-align:right;
-    }
-
-    .grid{
-      display:grid;
-      gap:14px;
-    }
-
-    .grid.main-actions{
-      grid-template-columns:repeat(3,minmax(0,1fr));
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:18px;
-    }
-
-    .action{
-      min-height:128px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      transition:.18s ease;
-      cursor:pointer;
-    }
-
-    .action:hover{
-      transform:translateY(-2px);
-      box-shadow:0 14px 34px rgba(19,32,51,.12);
-    }
-
-    .action .icon{font-size:1.7rem}
-
-    .action h3{
-      margin:10px 0 4px;
-      font-size:1.05rem;
-    }
-
-    .action p{
-      margin:0;
-      color:var(--muted);
-      font-size:.88rem;
-      line-height:1.35;
-    }
-
-    .filters{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-bottom:14px;
-    }
-
-    .filter-btn{
-      appearance:none;
-      border:1px solid var(--line);
-      background:#fff;
-      color:var(--text);
-      padding:8px 12px;
-      border-radius:999px;
-      font-weight:700;
-      cursor:pointer;
-    }
-
-    .filter-btn.active{
-      background:var(--primary);
-      color:#fff;
-      border-color:var(--primary);
-    }
-
-    .schedule-list{
-      display:grid;
-      gap:10px;
-    }
-
-    .match-card{
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px;
-      background:#fbfcfe;
-    }
-
-    .match-top{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      margin-bottom:10px;
-    }
-
-    .time-court{
-      font-weight:800;
-      color:var(--primary);
-    }
-
-    .gender{
-      font-size:.76rem;
-      font-weight:800;
-      border-radius:999px;
-      padding:5px 8px;
-      background:#e9eef6;
-      color:#46556d;
-    }
-
-    .match-name{
-      color:var(--muted);
-      font-size:.82rem;
-      margin-bottom:8px;
-    }
-
-    .teams{
-      display:grid;
-      grid-template-columns:1fr auto 1fr;
-      gap:10px;
-      align-items:center;
-      font-weight:800;
-    }
-
-    .teams .team2{text-align:right}
-
-    .score{
-      min-width:58px;
-      text-align:center;
-      background:var(--primary);
-      color:#fff;
-      padding:8px 10px;
-      border-radius:10px;
-      font-size:1rem;
-    }
-
-    .score.empty{
-      background:#e9eef6;
-      color:#6d7a8f;
-    }
-
-    .empty-state,
-    .error-state,
-    .loading{
-      padding:18px;
-      text-align:center;
-      color:var(--muted);
-    }
-
-    .error-state{
-      color:#8a2c2c;
-      background:#fff2f2;
-      border:1px solid #f0caca;
-      border-radius:14px;
-    }
-
-    .split{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-top:14px;
-    }
-
-    .team-panel h2{
-      margin:0 0 4px;
-      font-size:1.25rem;
-    }
-
-    .team-panel .small{
-      color:var(--muted);
-      font-size:.9rem;
-      margin-bottom:14px;
-    }
-
-    .menu{
-      display:grid;
-      gap:10px;
-    }
-
-    .menu a{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:13px 14px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:#fbfcfe;
-      font-weight:700;
-    }
-
-    .menu a span:last-child{
-      color:var(--muted);
-      font-weight:600;
-    }
-
-    .footer{
-      text-align:center;
-      color:var(--muted);
-      font-size:.82rem;
-      margin-top:28px;
-    }
-
-    .footer strong{color:var(--text)}
-
-    @media (max-width:800px){
+    @media(max-width:800px){
       .hero-inner{flex-direction:column}
-      .grid.main-actions{grid-template-columns:1fr}
-      .split{grid-template-columns:1fr}
+      .quick{grid-template-columns:1fr}
+      .standing-head{display:none}
+      .standing-row{display:grid;grid-template-columns:38px 1fr;gap:0;padding:12px}
+      .standing-row>div{padding:3px 5px}
+      .standing-row .rank{grid-row:1/5;align-self:start;font-size:1.15rem;padding-top:5px}
+      .standing-row .team-cell{grid-column:2;margin-bottom:5px}
+      .standing-row .pts,.standing-row .metric{grid-column:2;text-align:left;display:flex;gap:6px;align-items:baseline}
+      .mobile-label{display:inline;color:var(--muted);font-size:.75rem;font-weight:700;min-width:76px}
+      .metric small{display:inline;margin:0;color:inherit;font-size:inherit}
     }
-
-    @media (max-width:520px){
-      .wrap{width:min(100% - 20px,1100px)}
-      .hero{padding:22px 0 24px}
+    @media(max-width:520px){
+      .wrap{width:calc(100% - 20px)}
       .card{padding:14px}
-      .teams{
-        grid-template-columns:1fr auto 1fr;
-        gap:7px;
-        font-size:.92rem;
-      }
-      .score{
-        min-width:50px;
-        padding:7px 8px;
-      }
-      .section-head{
-        align-items:flex-start;
-        flex-direction:column;
-      }
-      .updated{text-align:left}
+      .section-head{align-items:flex-start;flex-direction:column}
+      .teams{font-size:.9rem;gap:6px}
     }
   </style>
 </head>
-
 <body>
-  <header class="hero">
-    <div class="wrap">
-      <div class="hero-inner">
-        <div>
-          <div class="eyebrow">CISM European Championship</div>
-          <h1>Beach Volleyball 2026</h1>
-          <div class="subtitle">Live Schedule, Results & Standings</div>
-        </div>
-
-        <div class="live-badge">
-          <span class="dot"></span>
-          LIVE RESULTS
-        </div>
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">CISM European Championship</div>
+        <h1>Beach Volleyball 2026</h1>
+        <div class="subtitle">Live Schedule, Results & Standings</div>
       </div>
-
-      <div class="hero-note">
-        Results are updated continuously during the tournament.
-      </div>
+      <div class="live-badge"><span class="dot"></span> LIVE RESULTS</div>
     </div>
-  </header>
+  </div>
+</header>
 
-  <main class="wrap">
-
-    <section class="section">
-      <h2 class="section-title" style="margin-bottom:12px;">Quick access</h2>
-
-      <div class="grid main-actions">
-        <a class="card action" href="#schedule">
-          <div class="icon">🗓️</div>
-          <div>
-            <h3>Schedule & Results</h3>
-            <p>Match times, courts and current results.</p>
-          </div>
-        </a>
-
-        <a class="card action" href="#men">
-          <div class="icon">🏐</div>
-          <div>
-            <h3>Men</h3>
-            <p>Pool standings, main draw and double out.</p>
-          </div>
-        </a>
-
-        <a class="card action" href="#women">
-          <div class="icon">🏐</div>
-          <div>
-            <h3>Women</h3>
-            <p>Pool standings, main draw and double out.</p>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <section id="schedule" class="section">
-      <div class="card">
-        <div class="section-head">
-          <h2 class="section-title">Schedule & Results</h2>
-          <div class="updated" id="updatedText">Loading data…</div>
-        </div>
-
-        <div class="filters">
-          <button class="filter-btn active" data-filter="ALL">All</button>
-          <button class="filter-btn" data-filter="M">Men</button>
-          <button class="filter-btn" data-filter="W">Women</button>
-        </div>
-
-        <div id="scheduleList" class="schedule-list">
-          <div class="loading">Loading tournament data…</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section split">
-      <div id="men" class="card team-panel">
-        <h2>Men</h2>
-        <div class="small">Competition overview</div>
-
-        <div class="menu">
-          <a href="#schedule"><span>Schedule & Results</span><span>→</span></a>
-          <a href="#men-standings"><span>Pool Standings</span><span>→</span></a>
-          <a href="#men-draw"><span>Main Draw</span><span>→</span></a>
-          <a href="#men-doubleout"><span>Double Out</span><span>→</span></a>
-        </div>
-      </div>
-
-      <div id="women" class="card team-panel">
-        <h2>Women</h2>
-        <div class="small">Competition overview</div>
-
-        <div class="menu">
-          <a href="#schedule"><span>Schedule & Results</span><span>→</span></a>
-          <a href="#women-standings"><span>Pool Standings</span><span>→</span></a>
-          <a href="#women-draw"><span>Main Draw</span><span>→</span></a>
-          <a href="#women-doubleout"><span>Double Out</span><span>→</span></a>
-        </div>
-      </div>
-    </section>
-
-    <div class="footer">
-      <strong>CISM EC Beach Volleyball 2026</strong><br />
-      Live tournament information
+<main class="wrap">
+  <section class="section">
+    <h2 class="section-title">Quick access</h2>
+    <div class="quick">
+      <a class="card action" href="#schedule"><div class="icon">🗓️</div><div><h3>Schedule & Results</h3><p>Times, courts and current results.</p></div></a>
+      <a class="card action" href="#men-standings"><div class="icon">🏐</div><div><h3>Men</h3><p>All pool standings and statistics.</p></div></a>
+      <a class="card action" href="#women-standings"><div class="icon">🏐</div><div><h3>Women</h3><p>All pool standings and statistics.</p></div></a>
     </div>
+  </section>
 
-  </main>
+  <section id="schedule" class="section">
+    <div class="card">
+      <div class="section-head">
+        <h2 class="section-title" style="margin:0">Schedule & Results</h2>
+        <div class="updated" id="updatedText">Loading data…</div>
+      </div>
+      <div class="filters">
+        <button class="filter-btn active" data-filter="ALL">All</button>
+        <button class="filter-btn" data-filter="M">Men</button>
+        <button class="filter-btn" data-filter="W">Women</button>
+      </div>
+      <div id="scheduleList" class="schedule-list"><div class="loading">Loading tournament data…</div></div>
+    </div>
+  </section>
 
-  <script>
-    let scheduleData = [];
-    let activeFilter = "ALL";
+  <section id="men-standings" class="section">
+    <h2 class="division-title">Men · Pool Standings</h2>
+    <div id="menPools" class="pools"><div class="loading">Loading standings…</div></div>
+  </section>
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+  <section id="women-standings" class="section">
+    <h2 class="division-title">Women · Pool Standings</h2>
+    <div id="womenPools" class="pools"><div class="loading">Loading standings…</div></div>
+  </section>
+
+  <div class="footer"><strong>CISM EC Beach Volleyball 2026</strong><br>Live tournament information</div>
+</main>
+
+<script>
+let dataStore={schedule:[],menPools:[],womenPools:[]};
+let activeFilter="ALL";
+
+function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+function gender(v){v=String(v??"").trim().toUpperCase();if(v.startsWith("M"))return"M";if(v.startsWith("W")||v.startsWith("F"))return"W";return v}
+
+function renderSchedule(){
+  const box=document.getElementById("scheduleList");
+  const rows=dataStore.schedule.filter(x=>activeFilter==="ALL"||gender(x.gender)===activeFilter);
+  if(!rows.length){box.innerHTML='<div class="empty-state">No matches available.</div>';return}
+  box.innerHTML=rows.map(x=>{
+    const result=String(x.result??"").trim(), g=gender(x.gender);
+    return `<article class="match-card">
+      <div class="match-top"><div class="time-court">${esc(x.time||"—")}${x.court?" · Court "+esc(x.court):""}</div><div class="gender">${g==="M"?"MEN":g==="W"?"WOMEN":esc(x.gender)}</div></div>
+      <div class="match-name">${esc(x.match||"")}</div>
+      <div class="teams"><div>${esc(x.team1||"TBD")}</div><div class="score ${result?"":"empty"}">${esc(result||"–")}</div><div class="team2">${esc(x.team2||"TBD")}</div></div>
+    </article>`}).join("");
+}
+
+function renderPools(targetId,pools){
+  const box=document.getElementById(targetId);
+  if(!Array.isArray(pools)||!pools.length){box.innerHTML='<div class="card empty-state">No pool standings available.</div>';return}
+  box.innerHTML=pools.map(pool=>`
+    <article class="pool-card">
+      <div class="pool-title">${esc(pool.pool)}</div>
+      <div class="standing-head">
+        <div>#</div><div>Team</div><div>PTS</div><div>Matches W-L</div><div>Sets W-L / Ratio</div><div>Points W-L / Ratio</div>
+      </div>
+      ${(pool.teams||[]).map(t=>`
+        <div class="standing-row">
+          <div class="rank">${esc(t.rank||"–")}</div>
+          <div class="team-cell"><div class="team-name">${esc(t.team)}</div><div class="country">${esc(t.country)}</div></div>
+          <div class="pts"><span class="mobile-label">PTS</span>${esc(t.pts)}</div>
+          <div class="metric"><span class="mobile-label">Matches</span>${esc(t.matchesWon)}–${esc(t.matchesLost)}</div>
+          <div class="metric"><span class="mobile-label">Sets</span>${esc(t.setsWon)}–${esc(t.setsLost)} <small>Ratio ${esc(t.setRatio)}</small></div>
+          <div class="metric"><span class="mobile-label">Points</span>${esc(t.pointsWon)}–${esc(t.pointsLost)} <small>Ratio ${esc(t.pointRatio)}</small></div>
+        </div>`).join("")}
+    </article>`).join("");
+}
+
+async function loadData(){
+  try{
+    const r=await fetch("data.json?v="+Date.now(),{cache:"no-store"});
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    dataStore=await r.json();
+    dataStore.schedule=Array.isArray(dataStore.schedule)?dataStore.schedule:[];
+    dataStore.menPools=Array.isArray(dataStore.menPools)?dataStore.menPools:[];
+    dataStore.womenPools=Array.isArray(dataStore.womenPools)?dataStore.womenPools:[];
+
+    if(dataStore.updated){
+      const d=new Date(dataStore.updated);
+      document.getElementById("updatedText").textContent=!Number.isNaN(d.getTime())
+        ?"Last update: "+d.toLocaleDateString("en-GB")+" "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})
+        :"Last update: "+dataStore.updated;
     }
+    renderSchedule();
+    renderPools("menPools",dataStore.menPools);
+    renderPools("womenPools",dataStore.womenPools);
+  }catch(e){
+    document.getElementById("updatedText").textContent="Data unavailable";
+    document.getElementById("scheduleList").innerHTML='<div class="error-state">The live tournament data could not be loaded.</div>';
+    document.getElementById("menPools").innerHTML='<div class="card error-state">Standings unavailable.</div>';
+    document.getElementById("womenPools").innerHTML='<div class="card error-state">Standings unavailable.</div>';
+    console.error(e);
+  }
+}
 
-    function normaliseGender(value) {
-      const v = String(value ?? "").trim().toUpperCase();
-      if (v.startsWith("M")) return "M";
-      if (v.startsWith("W") || v.startsWith("F")) return "W";
-      return v;
-    }
+document.querySelectorAll(".filter-btn").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".filter-btn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); activeFilter=b.dataset.filter; renderSchedule();
+}));
 
-    function renderSchedule() {
-      const container = document.getElementById("scheduleList");
-
-      const filtered = scheduleData.filter(item => {
-        if (activeFilter === "ALL") return true;
-        return normaliseGender(item.gender) === activeFilter;
-      });
-
-      if (!filtered.length) {
-        container.innerHTML = '<div class="empty-state">No matches available.</div>';
-        return;
-      }
-
-      container.innerHTML = filtered.map(item => {
-        const result = String(item.result ?? "").trim();
-        const gender = normaliseGender(item.gender);
-        const genderLabel = gender === "M" ? "MEN" : gender === "W" ? "WOMEN" : escapeHtml(item.gender);
-
-        return `
-          <article class="match-card">
-            <div class="match-top">
-              <div class="time-court">
-                ${escapeHtml(item.time || "—")}
-                ${item.court ? " · Court " + escapeHtml(item.court) : ""}
-              </div>
-              <div class="gender">${genderLabel}</div>
-            </div>
-
-            <div class="match-name">${escapeHtml(item.match || "")}</div>
-
-            <div class="teams">
-              <div class="team1">${escapeHtml(item.team1 || "TBD")}</div>
-              <div class="score ${result ? "" : "empty"}">${escapeHtml(result || "–")}</div>
-              <div class="team2">${escapeHtml(item.team2 || "TBD")}</div>
-            </div>
-          </article>
-        `;
-      }).join("");
-    }
-
-    async function loadData() {
-      const updatedText = document.getElementById("updatedText");
-      const container = document.getElementById("scheduleList");
-
-      try {
-        const response = await fetch("data.json?v=" + Date.now(), { cache: "no-store" });
-
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status);
-        }
-
-        const data = await response.json();
-        scheduleData = Array.isArray(data.schedule) ? data.schedule : [];
-
-        if (data.updated) {
-          const date = new Date(data.updated);
-          if (!Number.isNaN(date.getTime())) {
-            updatedText.textContent =
-              "Last update: " +
-              date.toLocaleDateString("en-GB") +
-              " " +
-              date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-          } else {
-            updatedText.textContent = "Last update: " + data.updated;
-          }
-        } else {
-          updatedText.textContent = "";
-        }
-
-        renderSchedule();
-
-      } catch (error) {
-        updatedText.textContent = "Data unavailable";
-        container.innerHTML =
-          '<div class="error-state">The live tournament data could not be loaded.</div>';
-        console.error(error);
-      }
-    }
-
-    document.querySelectorAll(".filter-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-        activeFilter = button.dataset.filter;
-        renderSchedule();
-      });
-    });
-
-    loadData();
-
-    // Refresh live data automatically every 60 seconds
-    setInterval(loadData, 60000);
-  </script>
+loadData();
+setInterval(loadData,60000);
+</script>
 </body>
 </html>
