@@ -56,6 +56,19 @@
     .pts{font-weight:900;font-size:1rem;text-align:center}
     .metric{text-align:center}.metric small{display:block;color:var(--muted);font-size:.68rem;margin-top:2px}
     .mobile-label{display:none}
+    .draw-groups{display:grid;gap:14px}
+    .draw-group{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+    .draw-stage{background:var(--primary);color:#fff;padding:12px 15px;font-weight:800}
+    .draw-match{padding:13px 15px;border-top:1px solid var(--line)}
+    .draw-match:first-of-type{border-top:none}
+    .draw-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:.76rem;margin-bottom:8px}
+    .draw-teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;font-weight:800}
+    .draw-team2{text-align:right}
+    .draw-result{background:var(--primary);color:#fff;border-radius:10px;padding:7px 10px;min-width:54px;text-align:center}
+    .draw-result.pending{background:#e9eef6;color:#6d7a8f}
+    .draw-sets{text-align:center;color:var(--muted);font-size:.8rem;margin-top:7px}
+    .draw-scoreline{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .set-pill{background:#eef2f7;border-radius:999px;padding:5px 9px;font-size:.76rem;font-weight:700}
     .empty-state,.loading,.error-state{text-align:center;color:var(--muted);padding:18px}
     .error-state{background:#fff2f2;border:1px solid #f0caca;border-radius:14px;color:#8a2c2c}
     .footer{text-align:center;color:var(--muted);font-size:.82rem;margin-top:28px}
@@ -101,6 +114,8 @@
       <a class="card action" href="#schedule"><div class="icon">🗓️</div><div><h3>Schedule & Results</h3><p>Times, courts and current results.</p></div></a>
       <a class="card action" href="#men-standings"><div class="icon">🏐</div><div><h3>Men</h3><p>All pool standings and statistics.</p></div></a>
       <a class="card action" href="#women-standings"><div class="icon">🏐</div><div><h3>Women</h3><p>All pool standings and statistics.</p></div></a>
+      <a class="card action" href="#men-main-draw"><div class="icon">🏆</div><div><h3>Main Draw Men</h3><p>Matches, sets and results.</p></div></a>
+      <a class="card action" href="#women-main-draw"><div class="icon">🏆</div><div><h3>Main Draw Women</h3><p>Matches, sets and results.</p></div></a>
     </div>
   </section>
 
@@ -129,11 +144,21 @@
     <div id="womenPools" class="pools"><div class="loading">Loading standings…</div></div>
   </section>
 
+  <section id="men-main-draw" class="section">
+    <h2 class="division-title">Men · Main Draw</h2>
+    <div id="menMainDraw" class="draw-groups"><div class="loading">Loading main draw…</div></div>
+  </section>
+
+  <section id="women-main-draw" class="section">
+    <h2 class="division-title">Women · Main Draw</h2>
+    <div id="womenMainDraw" class="draw-groups"><div class="loading">Loading main draw…</div></div>
+  </section>
+
   <div class="footer"><strong>CISM EC Beach Volleyball 2026</strong><br>Live tournament information</div>
 </main>
 
 <script>
-let dataStore={schedule:[],menPools:[],womenPools:[]};
+let dataStore={schedule:[],menPools:[],womenPools:[],menMainDraw:[],womenMainDraw:[]};
 let activeFilter="ALL";
 
 function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
@@ -173,6 +198,48 @@ function renderPools(targetId,pools){
     </article>`).join("");
 }
 
+
+function renderMainDraw(targetId,matches){
+  const box=document.getElementById(targetId);
+  if(!Array.isArray(matches)||!matches.length){
+    box.innerHTML='<div class="card empty-state">No main draw matches available.</div>';return;
+  }
+
+  const groups=[];
+  const byStage=new Map();
+  matches.forEach(m=>{
+    const stage=(m.stage||"Matches").trim();
+    if(!byStage.has(stage)){byStage.set(stage,[]);groups.push(stage)}
+    byStage.get(stage).push(m);
+  });
+
+  box.innerHTML=groups.map(stage=>`
+    <article class="draw-group">
+      <div class="draw-stage">${esc(stage)}</div>
+      ${byStage.get(stage).map(m=>{
+        const played=String(m.result||"").trim()!=="";
+        const sets=[];
+        if(String(m.set1Team1||"").trim()!=="" || String(m.set1Team2||"").trim()!=="")
+          sets.push(`Set 1: ${esc(m.set1Team1||"–")}–${esc(m.set1Team2||"–")}`);
+        if(String(m.set2Team1||"").trim()!=="" || String(m.set2Team2||"").trim()!=="")
+          sets.push(`Set 2: ${esc(m.set2Team1||"–")}–${esc(m.set2Team2||"–")}`);
+        if(String(m.set3Team1||"").trim()!=="" || String(m.set3Team2||"").trim()!=="")
+          sets.push(`Set 3: ${esc(m.set3Team1||"–")}–${esc(m.set3Team2||"–")}`);
+
+        return `<div class="draw-match">
+          <div class="draw-meta"><span>Match ${esc(m.match)}</span><span>${esc(m.date||"")} ${esc(m.time||"")}</span></div>
+          <div class="draw-teams">
+            <div>${esc(m.team1||"TBD")}</div>
+            <div class="draw-result ${played?"":"pending"}">${esc(m.result||"–")}</div>
+            <div class="draw-team2">${esc(m.team2||"TBD")}</div>
+          </div>
+          ${m.setsText?`<div class="draw-sets">${esc(m.setsText)}</div>`:""}
+          ${sets.length?`<div class="draw-scoreline">${sets.map(s=>`<span class="set-pill">${s}</span>`).join("")}</div>`:""}
+        </div>`;
+      }).join("")}
+    </article>`).join("");
+}
+
 async function loadData(){
   try{
     const r=await fetch("data.json?v="+Date.now(),{cache:"no-store"});
@@ -181,6 +248,8 @@ async function loadData(){
     dataStore.schedule=Array.isArray(dataStore.schedule)?dataStore.schedule:[];
     dataStore.menPools=Array.isArray(dataStore.menPools)?dataStore.menPools:[];
     dataStore.womenPools=Array.isArray(dataStore.womenPools)?dataStore.womenPools:[];
+    dataStore.menMainDraw=Array.isArray(dataStore.menMainDraw)?dataStore.menMainDraw:[];
+    dataStore.womenMainDraw=Array.isArray(dataStore.womenMainDraw)?dataStore.womenMainDraw:[];
 
     if(dataStore.updated){
       const d=new Date(dataStore.updated);
@@ -191,11 +260,15 @@ async function loadData(){
     renderSchedule();
     renderPools("menPools",dataStore.menPools);
     renderPools("womenPools",dataStore.womenPools);
+    renderMainDraw("menMainDraw",dataStore.menMainDraw);
+    renderMainDraw("womenMainDraw",dataStore.womenMainDraw);
   }catch(e){
     document.getElementById("updatedText").textContent="Data unavailable";
     document.getElementById("scheduleList").innerHTML='<div class="error-state">The live tournament data could not be loaded.</div>';
     document.getElementById("menPools").innerHTML='<div class="card error-state">Standings unavailable.</div>';
     document.getElementById("womenPools").innerHTML='<div class="card error-state">Standings unavailable.</div>';
+    document.getElementById("menMainDraw").innerHTML='<div class="card error-state">Main draw unavailable.</div>';
+    document.getElementById("womenMainDraw").innerHTML='<div class="card error-state">Main draw unavailable.</div>';
     console.error(e);
   }
 }
