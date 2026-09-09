@@ -69,6 +69,16 @@
     .draw-sets{text-align:center;color:var(--muted);font-size:.8rem;margin-top:7px}
     .draw-scoreline{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px}
     .set-pill{background:#eef2f7;border-radius:999px;padding:5px 9px;font-size:.76rem;font-weight:700}
+    .bracket-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .bracket-tab{border:1px solid var(--line);background:#fff;padding:9px 13px;border-radius:999px;font-weight:800;cursor:pointer}
+    .bracket-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+    .bracket-shell{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+    .bracket-toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+    .bracket-toolbar strong{font-size:.95rem}
+    .bracket-toolbar a{font-size:.78rem;color:var(--primary2);font-weight:800}
+    .bracket-scroll{overflow:auto;-webkit-overflow-scrolling:touch;background:#fff}
+    .bracket-img{display:block;width:100%;height:auto;min-width:1050px}
+    .doubleout-note{color:var(--muted);font-size:.8rem;margin:8px 2px 0}
     .empty-state,.loading,.error-state{text-align:center;color:var(--muted);padding:18px}
     .error-state{background:#fff2f2;border:1px solid #f0caca;border-radius:14px;color:#8a2c2c}
     .footer{text-align:center;color:var(--muted);font-size:.82rem;margin-top:28px}
@@ -82,6 +92,7 @@
       .standing-row .rank{grid-row:1/5;align-self:start;font-size:1.15rem;padding-top:5px}
       .standing-row .team-cell{grid-column:2;margin-bottom:5px}
       .standing-row .pts,.standing-row .metric{grid-column:2;text-align:left;display:flex;gap:6px;align-items:baseline}
+      .bracket-img{min-width:1180px}
       .mobile-label{display:inline;color:var(--muted);font-size:.75rem;font-weight:700;min-width:76px}
       .metric small{display:inline;margin:0;color:inherit;font-size:inherit}
     }
@@ -116,6 +127,7 @@
       <a class="card action" href="#women-standings"><div class="icon">🏐</div><div><h3>Women</h3><p>All pool standings and statistics.</p></div></a>
       <a class="card action" href="#men-main-draw"><div class="icon">🏆</div><div><h3>Main Draw Men</h3><p>Matches, sets and results.</p></div></a>
       <a class="card action" href="#women-main-draw"><div class="icon">🏆</div><div><h3>Main Draw Women</h3><p>Matches, sets and results.</p></div></a>
+      <a class="card action" id="doubleOutQuickLink" href="#double-out" hidden><div class="icon">🥇</div><div><h3>Double Out</h3><p>Full tournament brackets.</p></div></a>
     </div>
   </section>
 
@@ -154,11 +166,30 @@
     <div id="womenMainDraw" class="draw-groups"><div class="loading">Loading main draw…</div></div>
   </section>
 
+  <section id="double-out" class="section" hidden>
+    <h2 class="division-title">Double Out · Tournament Brackets</h2>
+    <div class="bracket-tabs">
+      <button class="bracket-tab active" data-bracket="doubleout-men-main.png" data-title="Men · Main Draw">Men · Main Draw</button>
+      <button class="bracket-tab" data-bracket="doubleout-men-lucky-loser.png" data-title="Men · Lucky Looser">Men · Lucky Looser</button>
+      <button class="bracket-tab" data-bracket="doubleout-women-main.png" data-title="Women · Main Draw">Women · Main Draw</button>
+    </div>
+    <div class="bracket-shell">
+      <div class="bracket-toolbar">
+        <strong id="bracketTitle">Men · Main Draw</strong>
+        <a id="bracketOpen" href="doubleout-men-main.png" target="_blank" rel="noopener">Open full size ↗</a>
+      </div>
+      <div class="bracket-scroll">
+        <img id="bracketImage" class="bracket-img" src="doubleout-men-main.png" alt="Double Out tournament bracket">
+      </div>
+    </div>
+    <div class="doubleout-note">Tip: On mobile, swipe horizontally through the bracket or open it full size for zooming.</div>
+  </section>
+
   <div class="footer"><strong>CISM EC Beach Volleyball 2026</strong><br>Live tournament information</div>
 </main>
 
 <script>
-let dataStore={schedule:[],menPools:[],womenPools:[],menMainDraw:[],womenMainDraw:[]};
+let dataStore={schedule:[],menPools:[],womenPools:[],menMainDraw:[],womenMainDraw:[],doubleOutPublished:false};
 let activeFilter="ALL";
 
 function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
@@ -240,6 +271,39 @@ function renderMainDraw(targetId,matches){
     </article>`).join("");
 }
 
+
+function setupBracket(){
+  const section=document.getElementById("double-out");
+  const quick=document.getElementById("doubleOutQuickLink");
+  const published=dataStore.doubleOutPublished===true;
+
+  section.hidden=!published;
+  quick.hidden=!published;
+  if(!published)return;
+
+  const version=encodeURIComponent(dataStore.updated||Date.now());
+  const active=document.querySelector(".bracket-tab.active");
+  if(active){
+    const file=active.dataset.bracket;
+    document.getElementById("bracketImage").src=file+"?v="+version;
+    document.getElementById("bracketOpen").href=file+"?v="+version;
+  }
+}
+
+document.querySelectorAll(".bracket-tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".bracket-tab").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+
+    const version=encodeURIComponent(dataStore.updated||Date.now());
+    const file=btn.dataset.bracket;
+
+    document.getElementById("bracketTitle").textContent=btn.dataset.title;
+    document.getElementById("bracketImage").src=file+"?v="+version;
+    document.getElementById("bracketOpen").href=file+"?v="+version;
+  });
+});
+
 async function loadData(){
   try{
     const r=await fetch("data.json?v="+Date.now(),{cache:"no-store"});
@@ -262,6 +326,7 @@ async function loadData(){
     renderPools("womenPools",dataStore.womenPools);
     renderMainDraw("menMainDraw",dataStore.menMainDraw);
     renderMainDraw("womenMainDraw",dataStore.womenMainDraw);
+    setupBracket();
   }catch(e){
     document.getElementById("updatedText").textContent="Data unavailable";
     document.getElementById("scheduleList").innerHTML='<div class="error-state">The live tournament data could not be loaded.</div>';
