@@ -243,6 +243,68 @@
   }
 }
 
+
+/* ===== Collapsible schedule days ===== */
+.schedule-day-group{
+  border:1px solid var(--line);
+  border-radius:16px;
+  overflow:hidden;
+  background:#fff;
+  margin:0 0 16px;
+}
+.schedule-day-toggle{
+  width:100%;
+  border:0;
+  background:#eef3f8;
+  color:var(--primary);
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  cursor:pointer;
+  font:inherit;
+  text-align:left;
+}
+.schedule-day-toggle:hover{background:#e6edf5}
+.schedule-day-toggle-label{
+  font-size:1rem;
+  font-weight:950;
+  letter-spacing:.02em;
+}
+.schedule-day-toggle-meta{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#66788a;
+  font-size:.78rem;
+  font-weight:800;
+  white-space:nowrap;
+}
+.schedule-day-chevron{
+  display:inline-block;
+  font-size:1.05rem;
+  transition:transform .18s ease;
+}
+.schedule-day-group.collapsed .schedule-day-chevron{
+  transform:rotate(-90deg);
+}
+.schedule-day-content{
+  padding:0 12px 12px;
+}
+.schedule-day-group.collapsed .schedule-day-content{
+  display:none;
+}
+.schedule-day-group .schedule-time-block:first-child{
+  margin-top:14px;
+}
+@media(max-width:720px){
+  .schedule-day-toggle{padding:12px 13px}
+  .schedule-day-toggle-label{font-size:.93rem}
+  .schedule-day-toggle-meta{font-size:.68rem}
+  .schedule-day-content{padding:0 9px 9px}
+}
+
 </style>
 </head>
 <body>
@@ -251,7 +313,7 @@
     <img class="hero-event-logo" src="cism-beach-logo.png" alt="CISM Beach Volleyball event logo">
 
     <div class="hero-copy">
-      <div class="eyebrow">CISM</div>
+      <div class="eyebrow">CISM EUROPEAN CHAMPIONSHIP</div>
       <h1>Beach Volleyball 2026</h1>
       <p class="hero-subtitle">Live Schedule, Results &amp; Standings</p>
       <div class="hero-location">15–17 SEPTEMBER 2026&nbsp;&nbsp; | &nbsp;&nbsp;WARENDORF, GERMANY</div>
@@ -343,9 +405,19 @@ let dataStore={schedule:[],menPools:[],womenPools:[],menMainDraw:[],womenMainDra
 let activeDoubleOutGender="men";
 let activeMenBracket="championship";
 let activeFilter="ALL";
+let collapsedScheduleDays=new Set();
 
 function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
 function gender(v){v=String(v??"").trim().toUpperCase();if(v.startsWith("M"))return"M";if(v.startsWith("W")||v.startsWith("F"))return"W";return v}
+
+function toggleScheduleDay(day){
+  if(collapsedScheduleDays.has(day)){
+    collapsedScheduleDays.delete(day);
+  }else{
+    collapsedScheduleDays.add(day);
+  }
+  renderSchedule();
+}
 
 function renderSchedule(){
   const box=document.getElementById("scheduleList");
@@ -409,44 +481,67 @@ function renderSchedule(){
     return a._index-b._index;
   });
 
-  let currentDay="";
-  let currentTime="";
+  const grouped={};
+  rows.forEach(x=>{
+    if(!grouped[x._day])grouped[x._day]=[];
+    grouped[x._day].push(x);
+  });
+
   let out="";
 
-  rows.forEach(x=>{
-    const result=String(x.result??"").trim();
-    const g=gender(x.gender);
-    const time=String(x.time??"").trim();
+  Object.keys(dayInfo)
+    .sort((a,b)=>dayInfo[a].order-dayInfo[b].order)
+    .forEach(day=>{
+      const dayRows=grouped[day]||[];
+      if(!dayRows.length)return;
 
-    if(x._day!==currentDay){
-      currentDay=x._day;
-      currentTime="";
-      out+=`<div class="schedule-day">
-        <div class="schedule-day-title">${esc(dayInfo[x._day]?.label||x._day)}</div>
-      </div>`;
-    }
+      const collapsed=collapsedScheduleDays.has(day);
+      const matchCount=dayRows.length;
 
-    if(time!==currentTime){
-      currentTime=time;
-      out+=`<div class="schedule-time-block">
-        <div class="schedule-time-title">${esc(time||"Time TBD")}</div>
-      </div>`;
-    }
+      out+=`<section class="schedule-day-group ${collapsed?"collapsed":""}">
+        <button class="schedule-day-toggle"
+                type="button"
+                onclick="toggleScheduleDay('${day}')"
+                aria-expanded="${collapsed?"false":"true"}">
+          <span class="schedule-day-toggle-label">${esc(dayInfo[day].label)}</span>
+          <span class="schedule-day-toggle-meta">
+            <span>${matchCount} ${matchCount===1?"match":"matches"}</span>
+            <span class="schedule-day-chevron">▼</span>
+          </span>
+        </button>
+        <div class="schedule-day-content">`;
 
-    const courtLabel=String(x.court||"").trim();
-    out+=`<article class="match-card">
-      <div class="match-top">
-        <div class="time-court">${esc(courtLabel||"Court TBD")}</div>
-        <div class="gender">${g==="M"?"MEN":g==="W"?"WOMEN":esc(x.gender)}</div>
-      </div>
-      <div class="match-name">${esc(x.match||"")}</div>
-      <div class="teams">
-        <div>${esc(x.team1||"TBD")}</div>
-        <div class="score ${result?"":"empty"}">${esc(result||"–")}</div>
-        <div class="team2">${esc(x.team2||"TBD")}</div>
-      </div>
-    </article>`;
-  });
+      let currentTime="";
+
+      dayRows.forEach(x=>{
+        const result=String(x.result??"").trim();
+        const g=gender(x.gender);
+        const time=String(x.time??"").trim();
+
+        if(time!==currentTime){
+          currentTime=time;
+          out+=`<div class="schedule-time-block">
+            <div class="schedule-time-title">${esc(time||"Time TBD")}</div>
+          </div>`;
+        }
+
+        const courtLabel=String(x.court||"").trim();
+        out+=`<article class="match-card">
+          <div class="match-top">
+            <div class="time-court">${esc(courtLabel||"Court TBD")}</div>
+            <div class="gender">${g==="M"?"MEN":g==="W"?"WOMEN":esc(x.gender)}</div>
+          </div>
+          <div class="match-name">${esc(x.match||"")}</div>
+          <div class="teams">
+            <div>${esc(x.team1||"TBD")}</div>
+            <div class="score ${result?"":"empty"}">${esc(result||"–")}</div>
+            <div class="team2">${esc(x.team2||"TBD")}</div>
+          </div>
+        </article>`;
+      });
+
+      out+=`</div></section>`;
+    });
 
   box.innerHTML=out;
 }
