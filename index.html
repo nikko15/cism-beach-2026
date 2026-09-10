@@ -36,6 +36,12 @@
     .filter-btn{border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:999px;font-weight:700;cursor:pointer}
     .filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
     .schedule-list,.pools{display:grid;gap:10px}
+    .schedule-day{margin:30px 0 12px}
+    .schedule-day:first-child{margin-top:0}
+    .schedule-day-title{padding:13px 15px;border:1px solid var(--line);border-radius:15px;background:#eef3f8;color:var(--primary);font-size:1rem;font-weight:950;letter-spacing:.02em}
+    .schedule-time-block{display:flex;align-items:center;gap:10px;margin:20px 0 9px}
+    .schedule-time-block:after{content:"";height:1px;background:var(--line);flex:1}
+    .schedule-time-title{padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#24364a;font-size:.86rem;font-weight:950}
     .match-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fbfcfe}
     .match-top{display:flex;justify-content:space-between;gap:12px;margin-bottom:9px}
     .time-court{font-weight:800;color:var(--primary)} .gender{font-size:.75rem;font-weight:800;background:#e9eef6;padding:5px 8px;border-radius:999px}
@@ -244,15 +250,106 @@ function gender(v){v=String(v??"").trim().toUpperCase();if(v.startsWith("M"))ret
 
 function renderSchedule(){
   const box=document.getElementById("scheduleList");
-  const rows=dataStore.schedule.filter(x=>activeFilter==="ALL"||gender(x.gender)===activeFilter);
-  if(!rows.length){box.innerHTML='<div class="empty-state">No matches available.</div>';return}
-  box.innerHTML=rows.map(x=>{
-    const result=String(x.result??"").trim(), g=gender(x.gender);
-    return `<article class="match-card">
-      <div class="match-top"><div class="time-court">${esc(x.time||"—")}${x.court?" · Court "+esc(x.court):""}</div><div class="gender">${g==="M"?"MEN":g==="W"?"WOMEN":esc(x.gender)}</div></div>
+
+  /*
+    The public schedule is exported in three fixed day blocks:
+    0–71   = Tuesday, 15.09.2026
+    72–143 = Wednesday, 16.09.2026
+    144+   = Thursday, 17.09.2026
+
+    We assign the date BEFORE applying Men/Women filters so that
+    filtering never changes the day assignment.
+  */
+  const rows=dataStore.schedule
+    .map((x,index)=>({
+      ...x,
+      _index:index,
+      _day:index<72?"2026-09-15":index<144?"2026-09-16":"2026-09-17"
+    }))
+    .filter(x=>activeFilter==="ALL"||gender(x.gender)===activeFilter);
+
+  if(!rows.length){
+    box.innerHTML='<div class="empty-state">No matches available.</div>';
+    return;
+  }
+
+  const dayInfo={
+    "2026-09-15":{order:1,label:"Tuesday · 15 September 2026"},
+    "2026-09-16":{order:2,label:"Wednesday · 16 September 2026"},
+    "2026-09-17":{order:3,label:"Thursday · 17 September 2026"}
+  };
+
+  function timeMinutes(v){
+    const s=String(v??"").trim().toUpperCase();
+    const m=s.match(/(\d{1,2})[.:](\d{2})\s*(AM|PM)?/);
+    if(!m)return 99999;
+    let h=Number(m[1]), min=Number(m[2]);
+    const ap=m[3]||"";
+    if(ap==="PM"&&h!==12)h+=12;
+    if(ap==="AM"&&h===12)h=0;
+    return h*60+min;
+  }
+
+  function courtOrder(v){
+    const s=String(v??"").trim().toUpperCase();
+    if(s.includes("CENTER"))return 0;
+    const m=s.match(/COURT\s*(\d+)/);
+    return m?Number(m[1]):99;
+  }
+
+  rows.sort((a,b)=>{
+    const d=(dayInfo[a._day]?.order??99)-(dayInfo[b._day]?.order??99);
+    if(d)return d;
+
+    const t=timeMinutes(a.time)-timeMinutes(b.time);
+    if(t)return t;
+
+    const c=courtOrder(a.court)-courtOrder(b.court);
+    if(c)return c;
+
+    return a._index-b._index;
+  });
+
+  let currentDay="";
+  let currentTime="";
+  let out="";
+
+  rows.forEach(x=>{
+    const result=String(x.result??"").trim();
+    const g=gender(x.gender);
+    const time=String(x.time??"").trim();
+
+    if(x._day!==currentDay){
+      currentDay=x._day;
+      currentTime="";
+      out+=`<div class="schedule-day">
+        <div class="schedule-day-title">${esc(dayInfo[x._day]?.label||x._day)}</div>
+      </div>`;
+    }
+
+    if(time!==currentTime){
+      currentTime=time;
+      out+=`<div class="schedule-time-block">
+        <div class="schedule-time-title">${esc(time||"Time TBD")}</div>
+      </div>`;
+    }
+
+    const courtLabel=String(x.court||"").trim();
+    out+=`<article class="match-card">
+      <div class="match-top">
+        <div class="time-court">${esc(courtLabel||"Court TBD")}</div>
+        <div class="gender">${g==="M"?"MEN":g==="W"?"WOMEN":esc(x.gender)}</div>
+      </div>
       <div class="match-name">${esc(x.match||"")}</div>
-      <div class="teams"><div>${esc(x.team1||"TBD")}</div><div class="score ${result?"":"empty"}">${esc(result||"–")}</div><div class="team2">${esc(x.team2||"TBD")}</div></div>
-    </article>`}).join("");
+      <div class="teams">
+        <div>${esc(x.team1||"TBD")}</div>
+        <div class="score ${result?"":"empty"}">${esc(result||"–")}</div>
+        <div class="team2">${esc(x.team2||"TBD")}</div>
+      </div>
+    </article>`;
+  });
+
+  box.innerHTML=out;
 }
 
 function renderPools(targetId,pools){
