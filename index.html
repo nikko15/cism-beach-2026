@@ -69,16 +69,46 @@
     .draw-sets{text-align:center;color:var(--muted);font-size:.8rem;margin-top:7px}
     .draw-scoreline{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px}
     .set-pill{background:#eef2f7;border-radius:999px;padding:5px 9px;font-size:.76rem;font-weight:700}
-    .bracket-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    .bracket-tab{border:1px solid var(--line);background:#fff;padding:9px 13px;border-radius:999px;font-weight:800;cursor:pointer}
-    .bracket-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
-    .bracket-shell{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
-    .bracket-toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
-    .bracket-toolbar strong{font-size:.95rem}
-    .bracket-toolbar a{font-size:.78rem;color:var(--primary2);font-weight:800}
-    .bracket-viewer{background:#eef2f7;height:min(76vh,820px)}
-    .bracket-pdf{display:block;width:100%;height:100%;border:0;background:#fff}
-    .doubleout-note{color:var(--muted);font-size:.8rem;margin:8px 2px 0}
+
+    /* ===== Native HTML Double Out ===== */
+    .do-shell{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    .do-head{padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;align-items:center}
+    .do-head h3{margin:0;font-size:1.15rem}
+    .do-head p{margin:4px 0 0;color:var(--muted);font-size:.82rem}
+    .do-gender-tabs{display:flex;gap:8px}
+    .do-gender-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font-weight:800;cursor:pointer}
+    .do-gender-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+    .do-body{padding:18px;background:linear-gradient(180deg,#fbfcfe,#f5f8fc)}
+    .do-lane{margin-bottom:24px}
+    .do-lane:last-child{margin-bottom:0}
+    .do-lane-title{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-weight:900;font-size:.92rem;text-transform:uppercase;letter-spacing:.04em}
+    .do-lane-title:after{content:"";height:1px;background:var(--line);flex:1}
+    .do-flow{display:flex;align-items:stretch;gap:14px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+    .do-round{min-width:255px;flex:0 0 255px}
+    .do-round-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:900;margin:0 0 8px 3px}
+    .do-round-matches{display:grid;gap:10px}
+    .do-arrow{align-self:center;color:#9aa8ba;font-size:1.4rem;font-weight:900;flex:0 0 18px;text-align:center;margin-top:25px}
+
+    .do-match{background:#fff;border:1px solid #dfe6ef;border-radius:15px;overflow:hidden;box-shadow:0 5px 16px rgba(19,32,51,.055)}
+    .do-match-top{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#eef2f7;color:#526177;font-size:.69rem;font-weight:900;text-transform:uppercase}
+    .do-status{width:7px;height:7px;border-radius:50%;background:#b7c0cc;display:inline-block;margin-right:5px}
+    .do-status.live{background:#27a867}
+    .do-team{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:7px;padding:9px 10px;border-top:1px solid #edf1f5}
+    .do-team:first-of-type{border-top:0}
+    .do-team.winner{background:#f4faf6}
+    .do-name{font-weight:800;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .do-name.placeholder{color:#8b97a8;font-weight:700;font-style:italic}
+    .do-sets{display:flex;gap:4px}
+    .do-set{min-width:23px;text-align:center;padding:4px 5px;border-radius:6px;background:#f1f4f8;color:#526177;font-size:.73rem;font-weight:800}
+    .do-total{min-width:26px;text-align:center;font-weight:950;font-size:.92rem;color:var(--primary)}
+    .do-medals{display:grid;grid-template-columns:repeat(2,minmax(240px,1fr));gap:14px}
+    .do-medal-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:12px}
+    .do-medal-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:var(--muted);margin-bottom:8px}
+    .do-medal-card.final{border-color:#d8c27b;box-shadow:0 8px 24px rgba(154,126,38,.10)}
+    .do-medal-card.final .do-medal-label{color:#8a6b0e}
+    .do-help{font-size:.76rem;color:var(--muted);margin-top:9px}
+
     .empty-state,.loading,.error-state{text-align:center;color:var(--muted);padding:18px}
     .error-state{background:#fff2f2;border:1px solid #f0caca;border-radius:14px;color:#8a2c2c}
     .footer{text-align:center;color:var(--muted);font-size:.82rem;margin-top:28px}
@@ -92,6 +122,11 @@
       .standing-row .rank{grid-row:1/5;align-self:start;font-size:1.15rem;padding-top:5px}
       .standing-row .team-cell{grid-column:2;margin-bottom:5px}
       .standing-row .pts,.standing-row .metric{grid-column:2;text-align:left;display:flex;gap:6px;align-items:baseline}
+      .do-head{align-items:flex-start;flex-direction:column}
+      .do-body{padding:13px}
+      .do-round{min-width:235px;flex-basis:235px}
+      .do-arrow{display:none}
+      .do-medals{grid-template-columns:1fr}
       .mobile-label{display:inline;color:var(--muted);font-size:.75rem;font-weight:700;min-width:76px}
       .metric small{display:inline;margin:0;color:inherit;font-size:inherit}
     }
@@ -126,7 +161,7 @@
       <a class="card action" href="#women-standings"><div class="icon">🏐</div><div><h3>Women</h3><p>All pool standings and statistics.</p></div></a>
       <a class="card action" href="#men-main-draw"><div class="icon">🏆</div><div><h3>Main Draw Men</h3><p>Matches, sets and results.</p></div></a>
       <a class="card action" href="#women-main-draw"><div class="icon">🏆</div><div><h3>Main Draw Women</h3><p>Matches, sets and results.</p></div></a>
-      <a class="card action" id="doubleOutQuickLink" href="#double-out" hidden><div class="icon">🥇</div><div><h3>Double Out</h3><p>Full tournament brackets.</p></div></a>
+      <a class="card action" id="doubleOutQuickLink" href="#double-out" hidden><div class="icon">🥇</div><div><h3>Double Out</h3><p>Interactive tournament bracket.</p></div></a>
     </div>
   </section>
 
@@ -166,31 +201,31 @@
   </section>
 
   <section id="double-out" class="section" hidden>
-    <h2 class="division-title">Double Out · Tournament Brackets</h2>
-    <div class="bracket-tabs">
-      <button class="bracket-tab active" data-bracket="doubleout-men-main.pdf" data-title="Men · Main Draw">Men · Main Draw</button>
-      <button class="bracket-tab" data-bracket="doubleout-men-lucky-loser.pdf" data-title="Men · Lucky Looser">Men · Lucky Looser</button>
-      <button class="bracket-tab" data-bracket="doubleout-women-main.pdf" data-title="Women · Main Draw">Women · Main Draw</button>
-    </div>
-    <div class="bracket-shell">
-      <div class="bracket-toolbar">
-        <strong id="bracketTitle">Men · Main Draw</strong>
-        <a id="bracketOpen" href="doubleout-men-main.pdf" target="_blank" rel="noopener">Open full size ↗</a>
+    <h2 class="division-title">Double Out · Tournament Bracket</h2>
+    <div class="do-shell">
+      <div class="do-head">
+        <div>
+          <h3>Road to the Medals</h3>
+          <p>Winner path, lucky-loser path, semifinals and medal matches — live from Excel.</p>
+        </div>
+        <div class="do-gender-tabs">
+          <button class="do-gender-btn active" data-do-gender="men">Men</button>
+          <button class="do-gender-btn" data-do-gender="women">Women</button>
+        </div>
       </div>
-      <div class="bracket-viewer">
-        <iframe id="bracketPdf" class="bracket-pdf"
-          src="doubleout-men-main.pdf#view=FitH"
-          title="Double Out tournament bracket"></iframe>
+      <div id="doubleOutBoard" class="do-body">
+        <div class="loading">Loading bracket…</div>
       </div>
     </div>
-    <div class="doubleout-note">Tip: Use “Open full size” for the best zoom experience, especially on mobile.</div>
+    <div class="do-help">On mobile: swipe horizontally through each path. Match cards update automatically after Excel is saved.</div>
   </section>
 
   <div class="footer"><strong>CISM EC Beach Volleyball 2026</strong><br>Live tournament information</div>
 </main>
 
 <script>
-let dataStore={schedule:[],menPools:[],womenPools:[],menMainDraw:[],womenMainDraw:[],doubleOutPublished:false};
+let dataStore={schedule:[],menPools:[],womenPools:[],menMainDraw:[],womenMainDraw:[],doubleOutPublished:false,menDoubleOut:[],womenDoubleOut:[]};
+let activeDoubleOutGender="men";
 let activeFilter="ALL";
 
 function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
@@ -273,35 +308,134 @@ function renderMainDraw(targetId,matches){
 }
 
 
-function setupBracket(){
-  const section=document.getElementById("double-out");
-  const quick=document.getElementById("doubleOutQuickLink");
-  const published=dataStore.doubleOutPublished===true;
+function doMatchCard(m){
+  const result=String(m.result||"").trim();
+  const [w1,w2]=result.includes(":")?result.split(":").map(Number):[null,null];
+  const winner1=m.played && w1!==null && w1>w2;
+  const winner2=m.played && w2!==null && w2>w1;
 
-  section.hidden=!published;
-  quick.hidden=!published;
-  if(!published)return;
+  const sets1=[m.set1Team1,m.set2Team1,m.set3Team1];
+  const sets2=[m.set1Team2,m.set2Team2,m.set3Team2];
 
-  const version=encodeURIComponent(dataStore.updated||Date.now());
-  const active=document.querySelector(".bracket-tab.active");
-  if(active){
-    const file=active.dataset.bracket;
-    document.getElementById("bracketPdf").src=file+"?v="+version+"#view=FitH";
-    document.getElementById("bracketOpen").href=file+"?v="+version;
-  }
+  const teamRow=(name,sets,total,isWinner)=>{
+    const isPlaceholder=!name || name==="TBD" || /^Winner of match|^Loser of match/i.test(name);
+    const visibleSets=sets.some(x=>String(x??"").trim()!=="");
+    return `<div class="do-team ${isWinner?"winner":""}">
+      <div class="do-name ${isPlaceholder?"placeholder":""}">${esc(name||"TBD")}</div>
+      <div class="do-sets">${visibleSets?sets.map(x=>`<span class="do-set">${esc(String(x??"").trim()||"–")}</span>`).join(""):""}</div>
+      <div class="do-total">${total===null||Number.isNaN(total)?"–":total}</div>
+    </div>`;
+  };
+
+  return `<article class="do-match">
+    <div class="do-match-top">
+      <span>Match ${esc(m.match)}</span>
+      <span><i class="do-status ${m.played?"live":""}"></i>${m.played?"RESULT":"UPCOMING"}</span>
+    </div>
+    ${teamRow(m.team1,sets1,w1,winner1)}
+    ${teamRow(m.team2,sets2,w2,winner2)}
+  </article>`;
 }
 
-document.querySelectorAll(".bracket-tab").forEach(btn=>{
+function doRound(title,matches){
+  return `<div class="do-round">
+    <div class="do-round-title">${esc(title)}</div>
+    <div class="do-round-matches">${matches.map(doMatchCard).join("")}</div>
+  </div>`;
+}
+
+function matchesByNums(all,nums){
+  const set=new Set(nums);
+  return all.filter(m=>set.has(Number(m.match))).sort((a,b)=>Number(a.match)-Number(b.match));
+}
+
+function renderDoubleOut(){
+  const section=document.getElementById("double-out");
+  const quick=document.getElementById("doubleOutQuickLink");
+
+  if(dataStore.doubleOutPublished!==true){
+    section.hidden=true;
+    quick.hidden=true;
+    return;
+  }
+
+  section.hidden=false;
+  quick.hidden=false;
+
+  const all=activeDoubleOutGender==="women"?dataStore.womenDoubleOut:dataStore.menDoubleOut;
+  const board=document.getElementById("doubleOutBoard");
+
+  if(!Array.isArray(all)||!all.length){
+    board.innerHTML='<div class="empty-state">Bracket data is not available yet.</div>';
+    return;
+  }
+
+  const m1=matchesByNums(all,[1,2,3,4,5,6,7,8]);
+  const m2=matchesByNums(all,[9,10,11,12]);
+  const mqW=matchesByNums(all,[21,22]);
+
+  const l1=matchesByNums(all,[13,14,15,16]);
+  const l2=matchesByNums(all,[17,18,19,20]);
+  const l3=matchesByNums(all,[23,24]);
+  const mqL=matchesByNums(all,[25,26]);
+
+  const semis=matchesByNums(all,[27,28]);
+  const bronze=matchesByNums(all,[29]);
+  const final=matchesByNums(all,[30]);
+
+  board.innerHTML=`
+    <div class="do-lane">
+      <div class="do-lane-title">Winner Path</div>
+      <div class="do-flow">
+        ${doRound("Main Draw",m1)}
+        <div class="do-arrow">›</div>
+        ${doRound("Winner Round",m2)}
+        <div class="do-arrow">›</div>
+        ${doRound("Quarterfinals",mqW)}
+      </div>
+    </div>
+
+    <div class="do-lane">
+      <div class="do-lane-title">Lucky Loser Path</div>
+      <div class="do-flow">
+        ${doRound("Round 1",l1)}
+        <div class="do-arrow">›</div>
+        ${doRound("Round 2",l2)}
+        <div class="do-arrow">›</div>
+        ${doRound("Round 3",l3)}
+        <div class="do-arrow">›</div>
+        ${doRound("Quarterfinals",mqL)}
+      </div>
+    </div>
+
+    <div class="do-lane">
+      <div class="do-lane-title">Final Four</div>
+      <div class="do-flow">
+        ${doRound("Semifinals",semis)}
+      </div>
+    </div>
+
+    <div class="do-lane">
+      <div class="do-lane-title">Medal Matches</div>
+      <div class="do-medals">
+        <div class="do-medal-card">
+          <div class="do-medal-label">🥉 Bronze Match · Match 29</div>
+          ${bronze.map(doMatchCard).join("")}
+        </div>
+        <div class="do-medal-card final">
+          <div class="do-medal-label">🏆 Final · Match 30</div>
+          ${final.map(doMatchCard).join("")}
+        </div>
+      </div>
+    </div>`;
+}
+
+document.querySelectorAll(".do-gender-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{
-    document.querySelectorAll(".bracket-tab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".do-gender-btn").forEach(x=>x.classList.remove("active"));
     btn.classList.add("active");
-
-    const version=encodeURIComponent(dataStore.updated||Date.now());
-    const file=btn.dataset.bracket;
-
-    document.getElementById("bracketTitle").textContent=btn.dataset.title;
-    document.getElementById("bracketPdf").src=file+"?v="+version+"#view=FitH";
-    document.getElementById("bracketOpen").href=file+"?v="+version;
+    activeDoubleOutGender=btn.dataset.doGender;
+    renderDoubleOut();
   });
 });
 
@@ -315,6 +449,8 @@ async function loadData(){
     dataStore.womenPools=Array.isArray(dataStore.womenPools)?dataStore.womenPools:[];
     dataStore.menMainDraw=Array.isArray(dataStore.menMainDraw)?dataStore.menMainDraw:[];
     dataStore.womenMainDraw=Array.isArray(dataStore.womenMainDraw)?dataStore.womenMainDraw:[];
+    dataStore.menDoubleOut=Array.isArray(dataStore.menDoubleOut)?dataStore.menDoubleOut:[];
+    dataStore.womenDoubleOut=Array.isArray(dataStore.womenDoubleOut)?dataStore.womenDoubleOut:[];
 
     if(dataStore.updated){
       const d=new Date(dataStore.updated);
@@ -327,7 +463,7 @@ async function loadData(){
     renderPools("womenPools",dataStore.womenPools);
     renderMainDraw("menMainDraw",dataStore.menMainDraw);
     renderMainDraw("womenMainDraw",dataStore.womenMainDraw);
-    setupBracket();
+    renderDoubleOut();
   }catch(e){
     document.getElementById("updatedText").textContent="Data unavailable";
     document.getElementById("scheduleList").innerHTML='<div class="error-state">The live tournament data could not be loaded.</div>';
