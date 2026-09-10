@@ -147,200 +147,117 @@
       .teams{font-size:.9rem;gap:6px}
     }
   
-/* =========================================================
-   CISM BEACH 2026 · VISUAL REDESIGN v6
-   Pure presentation layer: existing data logic stays intact.
-   ========================================================= */
-:root{
-  --primary:#082746;
-  --primary-2:#0b355e;
-  --accent:#087bea;
-  --accent-2:#0b94f6;
-  --ink:#102a45;
-  --muted:#64748b;
-  --line:#dfe7ef;
-  --surface:#ffffff;
-  --surface-2:#f3f7fb;
-  --shadow:0 12px 32px rgba(12,39,68,.09);
+/* ===== Final CISM event header ===== */
+.hero-final{
+  background:linear-gradient(105deg,#0a2948 0%,#143d68 100%);
+  color:#fff;
+  padding:0;
+  border:0;
 }
-body{
-  background:
-    radial-gradient(circle at 88% 0%,rgba(8,123,234,.08),transparent 26rem),
-    #f3f7fb;
-  color:var(--ink);
-}
-.container{max-width:1180px}
-.hero{
-  position:relative;
-  overflow:hidden;
-  padding:26px 0 24px;
-  background:linear-gradient(105deg,#fff 0%,#fff 55%,#edf5fc 100%);
-  border-bottom:1px solid #dce6ef;
-}
-.hero:after{
-  content:"";
-  position:absolute;
-  right:-80px;top:-120px;
-  width:460px;height:460px;border-radius:50%;
-  background:radial-gradient(circle,rgba(8,123,234,.10),transparent 68%);
-  pointer-events:none;
-}
-.hero-inner{position:relative;z-index:1}
-.event-brand{
+.hero-final-inner{
+  min-height:178px;
   display:grid;
-  grid-template-columns:138px minmax(0,1fr);
+  grid-template-columns:120px minmax(0,1fr) auto;
   align-items:center;
-  gap:24px;
+  gap:26px;
+  position:relative;
 }
-.event-logo{
-  width:128px;height:128px;object-fit:contain;display:block;
-  filter:drop-shadow(0 8px 14px rgba(15,39,68,.08));
+.hero-event-logo{
+  width:108px;
+  height:108px;
+  object-fit:contain;
+  display:block;
 }
-.event-title-wrap h1{
+.hero-copy{
+  min-width:0;
+  text-align:left;
+}
+.hero-final .eyebrow{
+  color:#c9d7e6;
+  font-size:.73rem;
+  font-weight:900;
+  letter-spacing:.20em;
+  margin:0 0 8px;
+}
+.hero-final h1{
+  color:#fff;
   margin:0;
-  font-size:clamp(2rem,4vw,3.35rem);
-  line-height:.95;
-  letter-spacing:.025em;
-  color:var(--primary);
-  text-transform:uppercase;
+  font-size:clamp(2rem,4vw,3rem);
+  line-height:1.03;
+  letter-spacing:.01em;
 }
-.event-kicker{
-  margin-top:10px;
+.hero-subtitle{
+  margin:8px 0 0;
+  color:#eef5fb;
+  font-size:1.05rem;
+  font-weight:500;
+}
+.hero-location{
+  margin-top:12px;
+  color:#c9d7e6;
+  font-size:.70rem;
   font-weight:800;
-  letter-spacing:.27em;
-  color:#29445f;
-  text-transform:uppercase;
+  letter-spacing:.16em;
 }
-.event-meta{
-  margin-top:16px;
-  display:flex;gap:13px;align-items:center;flex-wrap:wrap;
-  font-size:.88rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+.live-pill{
+  align-self:start;
+  margin-top:22px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+  padding:10px 15px;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  font-size:.76rem;
+  font-weight:950;
 }
-.event-meta .dot{width:4px;height:4px;border-radius:50%;background:#9aabba}
-.friendship{
-  margin-top:10px;
-  font-size:.83rem;font-style:italic;font-weight:700;color:#65778a;
+.live-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#ff5263;
+  box-shadow:0 0 0 4px rgba(255,82,99,.10);
 }
-
-.quick{margin-top:22px}
-.quick-grid{gap:10px}
-.card.action{
-  border:1px solid var(--line);
-  box-shadow:none;
-  transition:.18s ease;
-}
-.card.action:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(10,44,78,.08);border-color:#c9d7e5}
-
-.section{margin-top:34px}
-.section>h2,.division-title{
-  color:var(--primary);
-  letter-spacing:.015em;
-}
-.toolbar{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:13px;
-  box-shadow:0 6px 20px rgba(15,39,68,.05);
-}
-.filter-btn{font-weight:850}
-.filter-btn.active{
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  box-shadow:0 7px 17px rgba(8,123,234,.22);
-}
-.schedule-day-title{
-  color:#fff!important;
-  background:linear-gradient(100deg,var(--primary),var(--primary-2))!important;
-  border:0!important;
-  box-shadow:0 6px 18px rgba(8,39,70,.12);
-  text-transform:uppercase;
-}
-.schedule-time-title{
-  color:var(--primary)!important;
-  border-color:#cfdae5!important;
-  box-shadow:0 3px 9px rgba(15,39,68,.04);
-}
-.match-card{
-  border:1px solid var(--line);
-  box-shadow:0 6px 18px rgba(15,39,68,.055);
-  transition:.16s ease;
-}
-.match-card:hover{border-color:#c8d6e4;transform:translateY(-1px)}
-.match-top{
-  background:#f5f8fb;
-  border-bottom:1px solid #e7edf3;
-}
-.gender{color:var(--accent);font-weight:900}
-.score{
-  background:var(--primary)!important;
-  color:#fff!important;
-  border-radius:9px!important;
-}
-.score.empty{background:#e8eef4!important;color:#728197!important}
-
-.pool-card,.draw-group,.do-shell{
-  border-color:var(--line)!important;
-  box-shadow:var(--shadow)!important;
-}
-.pool-title,.draw-stage-title{
-  background:linear-gradient(100deg,var(--primary),var(--primary-2))!important;
-  color:#fff!important;
-}
-.standing-row:nth-child(even){background:#fbfcfe}
-.do-head{
-  background:#fff;
-}
-.do-gender-btn.active{
-  background:linear-gradient(135deg,var(--accent),var(--accent-2))!important;
-  border-color:var(--accent)!important;
-}
-.do-subtab-btn.active{
-  background:#eaf4fe!important;
-  border-color:#b9d9f7!important;
-  color:#075ea9!important;
-}
-.do-lane-title{color:var(--primary)}
-.do-match{box-shadow:0 6px 18px rgba(15,39,68,.06)!important}
-.do-match-top{
-  background:var(--primary)!important;
-  color:#fff!important;
-}
-.do-team.winner{background:#eef9f3!important}
-.footer{
-  margin-top:46px;
-  padding:28px 0 38px;
-  color:#6b7d90;
-}
-
-@media(max-width:700px){
-  .hero{padding:18px 0}
-  .event-brand{grid-template-columns:82px minmax(0,1fr);gap:14px}
-  .event-logo{width:78px;height:78px}
-  .event-title-wrap h1{font-size:1.75rem;line-height:1}
-  .event-kicker{font-size:.66rem;letter-spacing:.14em;margin-top:7px}
-  .event-meta{font-size:.69rem;gap:7px;margin-top:10px}
-  .friendship{font-size:.72rem;margin-top:7px}
-  .quick{margin-top:15px}
+@media(max-width:720px){
+  .hero-final-inner{
+    min-height:150px;
+    grid-template-columns:72px minmax(0,1fr);
+    gap:14px;
+    padding-top:16px;
+    padding-bottom:16px;
+  }
+  .hero-event-logo{width:68px;height:68px}
+  .hero-final .eyebrow{font-size:.56rem;letter-spacing:.12em;margin-bottom:5px}
+  .hero-final h1{font-size:1.65rem}
+  .hero-subtitle{font-size:.82rem;margin-top:5px}
+  .hero-location{font-size:.53rem;letter-spacing:.08em;margin-top:8px}
+  .live-pill{
+    position:absolute;
+    top:10px;
+    right:0;
+    margin:0;
+    padding:7px 9px;
+    font-size:.60rem;
+  }
 }
 
 </style>
 </head>
 <body>
-<header class="hero">
-  <div class="container hero-inner">
-    <div class="event-brand">
-      <img class="event-logo" src="cism-beach-logo.png" alt="CISM Beach Volleyball 2026 event logo">
-      <div class="event-title-wrap">
-        <h1>Beach Volleyball 2026</h1>
-        <div class="event-kicker">CISM European Championship</div>
-        <div class="event-meta">
-          <span>15–17 September 2026</span>
-          <span class="dot"></span>
-          <span>Rheine, Germany</span>
-        </div>
-        <div class="friendship">Friendship through Sport</div>
-      </div>
+<header class="hero hero-final">
+  <div class="container hero-final-inner">
+    <img class="hero-event-logo" src="cism-beach-logo.png" alt="CISM Beach Volleyball event logo">
+
+    <div class="hero-copy">
+      <div class="eyebrow">CISM EUROPEAN CHAMPIONSHIP</div>
+      <h1>Beach Volleyball 2026</h1>
+      <p class="hero-subtitle">Live Schedule, Results &amp; Standings</p>
+      <div class="hero-location">15–17 SEPTEMBER 2026&nbsp;&nbsp; | &nbsp;&nbsp;WARENDORF, GERMANY</div>
     </div>
+
+    <div class="live-pill"><span class="live-dot"></span>LIVE RESULTS</div>
   </div>
 </header>
 
