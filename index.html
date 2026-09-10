@@ -549,22 +549,45 @@ function renderSchedule(){
 function renderPools(targetId,pools){
   const box=document.getElementById(targetId);
   if(!Array.isArray(pools)||!pools.length){box.innerHTML='<div class="card empty-state">No pool standings available.</div>';return}
-  box.innerHTML=pools.map(pool=>`
+
+  const ratioValue=v=>{
+    const s=String(v??"").trim().toUpperCase();
+    if(s==="MAX")return Number.POSITIVE_INFINITY;
+    const n=Number(String(v??"").replace(",","."));
+    return Number.isFinite(n)?n:-1;
+  };
+
+  box.innerHTML=pools.map(pool=>{
+    const teams=[...(pool.teams||[])].sort((a,b)=>{
+      const ptsDiff=Number(b.pts||0)-Number(a.pts||0);
+      if(ptsDiff)return ptsDiff;
+
+      const setRatioDiff=ratioValue(b.setRatio)-ratioValue(a.setRatio);
+      if(setRatioDiff)return setRatioDiff;
+
+      const pointRatioDiff=ratioValue(b.pointRatio)-ratioValue(a.pointRatio);
+      if(pointRatioDiff)return pointRatioDiff;
+
+      return String(a.team||"").localeCompare(String(b.team||""));
+    });
+
+    return `
     <article class="pool-card">
       <div class="pool-title">${esc(pool.pool)}</div>
       <div class="standing-head">
         <div>#</div><div>Team</div><div>PTS</div><div>Matches W-L</div><div>Sets W-L / Ratio</div><div>Points W-L / Ratio</div>
       </div>
-      ${(pool.teams||[]).map(t=>`
+      ${teams.map((t,index)=>`
         <div class="standing-row">
-          <div class="rank">${esc(t.rank||"–")}</div>
+          <div class="rank">${index+1}</div>
           <div class="team-cell"><div class="team-name">${esc(t.team)}</div><div class="country">${esc(t.country)}</div></div>
           <div class="pts"><span class="mobile-label">PTS</span>${esc(t.pts)}</div>
           <div class="metric"><span class="mobile-label">Matches</span>${esc(t.matchesWon)}–${esc(t.matchesLost)}</div>
           <div class="metric"><span class="mobile-label">Sets</span>${esc(t.setsWon)}–${esc(t.setsLost)} <small>Ratio ${esc(t.setRatio)}</small></div>
           <div class="metric"><span class="mobile-label">Points</span>${esc(t.pointsWon)}–${esc(t.pointsLost)} <small>Ratio ${esc(t.pointRatio)}</small></div>
         </div>`).join("")}
-    </article>`).join("");
+    </article>`;
+  }).join("");
 }
 
 
