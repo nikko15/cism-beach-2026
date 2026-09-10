@@ -596,7 +596,11 @@ async function loadData(){
     renderPools("menPools",dataStore.menPools);
     renderPools("womenPools",dataStore.womenPools);
     renderMainDraw("menMainDraw",dataStore.menMainDraw);
-    renderMainDraw("womenMainDraw",dataStore.womenMainDraw);
+
+    // WOMEN: only the populated Main Draw area through Excel row 30.
+    // This suppresses the empty Pool M / Pool N area.
+    renderMainDraw("womenMainDraw",dataStore.womenMainDraw.slice(0,24));
+
     renderDoubleOut();
   }catch(e){
     document.getElementById("updatedText").textContent="Data unavailable";
