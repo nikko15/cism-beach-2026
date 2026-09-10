@@ -594,7 +594,10 @@ async function loadData(){
     }
     renderSchedule();
     renderPools("menPools",dataStore.menPools);
-    renderPools("womenPools",dataStore.womenPools);
+
+    // WOMEN: only Pools I–L are used.
+    // Suppress the empty Pool M / Pool N tables on the website.
+    renderPools("womenPools",dataStore.womenPools.slice(0,4));
     renderMainDraw("menMainDraw",dataStore.menMainDraw);
 
     // WOMEN: only the populated Main Draw area through Excel row 30.
