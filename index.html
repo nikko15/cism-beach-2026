@@ -78,6 +78,10 @@
     .do-gender-tabs{display:flex;gap:8px}
     .do-gender-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font-weight:800;cursor:pointer}
     .do-gender-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .do-subtabs{display:flex;gap:8px;margin-top:9px}
+    .do-subtab-btn{border:1px solid var(--line);background:#f7f9fc;border-radius:10px;padding:8px 11px;font-size:.76rem;font-weight:900;cursor:pointer}
+    .do-subtab-btn.active{background:#e9eef6;border-color:#aeb9c8;color:var(--primary)}
+    .do-subtabs[hidden]{display:none}
 
     .do-body{padding:18px;background:linear-gradient(180deg,#fbfcfe,#f5f8fc)}
     .do-lane{margin-bottom:24px}
@@ -208,9 +212,15 @@
           <h3>Road to the Medals</h3>
           <p>Winner path, lucky-loser path, semifinals and medal matches — live from Excel.</p>
         </div>
-        <div class="do-gender-tabs">
-          <button class="do-gender-btn active" data-do-gender="men">Men</button>
-          <button class="do-gender-btn" data-do-gender="women">Women</button>
+        <div>
+          <div class="do-gender-tabs">
+            <button class="do-gender-btn active" data-do-gender="men">Men</button>
+            <button class="do-gender-btn" data-do-gender="women">Women</button>
+          </div>
+          <div id="menBracketTabs" class="do-subtabs">
+            <button class="do-subtab-btn active" data-men-bracket="championship">Places 1–16</button>
+            <button class="do-subtab-btn" data-men-bracket="placement">Places 17–32</button>
+          </div>
         </div>
       </div>
       <div id="doubleOutBoard" class="do-body">
@@ -224,8 +234,9 @@
 </main>
 
 <script>
-let dataStore={schedule:[],menPools:[],womenPools:[],menMainDraw:[],womenMainDraw:[],doubleOutPublished:false,menDoubleOut:[],womenDoubleOut:[]};
+let dataStore={schedule:[],menPools:[],womenPools:[],menMainDraw:[],womenMainDraw:[],doubleOutPublished:false,menDoubleOut:[],menPlacementDoubleOut:[],womenDoubleOut:[]};
 let activeDoubleOutGender="men";
+let activeMenBracket="championship";
 let activeFilter="ALL";
 
 function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
@@ -352,6 +363,7 @@ function matchesByNums(all,nums){
 function renderDoubleOut(){
   const section=document.getElementById("double-out");
   const quick=document.getElementById("doubleOutQuickLink");
+  const subTabs=document.getElementById("menBracketTabs");
 
   if(dataStore.doubleOutPublished!==true){
     section.hidden=true;
@@ -361,8 +373,26 @@ function renderDoubleOut(){
 
   section.hidden=false;
   quick.hidden=false;
+  subTabs.hidden=activeDoubleOutGender!=="men";
 
-  const all=activeDoubleOutGender==="women"?dataStore.womenDoubleOut:dataStore.menDoubleOut;
+  let all=[];
+  let bracketTitle="";
+  let bracketSubtitle="";
+
+  if(activeDoubleOutGender==="women"){
+    all=dataStore.womenDoubleOut;
+    bracketTitle="Women · Championship Bracket";
+    bracketSubtitle="Complete double-out bracket";
+  }else if(activeMenBracket==="placement"){
+    all=dataStore.menPlacementDoubleOut;
+    bracketTitle="Men · Placement Bracket · Places 17–32";
+    bracketSubtitle="Independent placement tournament";
+  }else{
+    all=dataStore.menDoubleOut;
+    bracketTitle="Men · Championship Bracket · Places 1–16";
+    bracketSubtitle="Independent championship tournament";
+  }
+
   const board=document.getElementById("doubleOutBoard");
 
   if(!Array.isArray(all)||!all.length){
@@ -370,41 +400,38 @@ function renderDoubleOut(){
     return;
   }
 
-  const m1=matchesByNums(all,[1,2,3,4,5,6,7,8]);
-  const m2=matchesByNums(all,[9,10,11,12]);
-  const mqW=matchesByNums(all,[21,22]);
-
-  const l1=matchesByNums(all,[13,14,15,16]);
-  const l2=matchesByNums(all,[17,18,19,20]);
-  const l3=matchesByNums(all,[23,24]);
-  const mqL=matchesByNums(all,[25,26]);
-
+  const r1=matchesByNums(all,[1,2,3,4,5,6,7,8]);
+  const r2=matchesByNums(all,[9,10,11,12]);
+  const r3=matchesByNums(all,[13,14,15,16]);
+  const r4=matchesByNums(all,[17,18,19,20]);
+  const qf1=matchesByNums(all,[21,22]);
+  const qf2=matchesByNums(all,[23,24,25,26]);
   const semis=matchesByNums(all,[27,28]);
   const bronze=matchesByNums(all,[29]);
   const final=matchesByNums(all,[30]);
 
   board.innerHTML=`
     <div class="do-lane">
-      <div class="do-lane-title">Winner Path</div>
+      <div class="do-lane-title">${esc(bracketTitle)}</div>
+      <div class="do-help" style="margin:0 0 12px 0">${esc(bracketSubtitle)}</div>
+
       <div class="do-flow">
-        ${doRound("Main Draw",m1)}
+        ${doRound("Round 1",r1)}
         <div class="do-arrow">›</div>
-        ${doRound("Winner Round",m2)}
+        ${doRound("Round 2",r2)}
         <div class="do-arrow">›</div>
-        ${doRound("Quarterfinals",mqW)}
+        ${doRound("Round 3",r3)}
+        <div class="do-arrow">›</div>
+        ${doRound("Round 4",r4)}
       </div>
     </div>
 
     <div class="do-lane">
-      <div class="do-lane-title">Lucky Loser Path</div>
+      <div class="do-lane-title">Quarterfinal Stage</div>
       <div class="do-flow">
-        ${doRound("Round 1",l1)}
+        ${doRound("Quarterfinals",qf1)}
         <div class="do-arrow">›</div>
-        ${doRound("Round 2",l2)}
-        <div class="do-arrow">›</div>
-        ${doRound("Round 3",l3)}
-        <div class="do-arrow">›</div>
-        ${doRound("Quarterfinals",mqL)}
+        ${doRound("Quarterfinals / Placement",qf2)}
       </div>
     </div>
 
@@ -419,7 +446,7 @@ function renderDoubleOut(){
       <div class="do-lane-title">Medal Matches</div>
       <div class="do-medals">
         <div class="do-medal-card">
-          <div class="do-medal-label">🥉 Bronze Match · Match 29</div>
+          <div class="do-medal-label">🥉 Bronze Medal Match · Match 29</div>
           ${bronze.map(doMatchCard).join("")}
         </div>
         <div class="do-medal-card final">
@@ -439,6 +466,15 @@ document.querySelectorAll(".do-gender-btn").forEach(btn=>{
   });
 });
 
+document.querySelectorAll(".do-subtab-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".do-subtab-btn").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    activeMenBracket=btn.dataset.menBracket;
+    renderDoubleOut();
+  });
+});
+
 async function loadData(){
   try{
     const r=await fetch("data.json?v="+Date.now(),{cache:"no-store"});
@@ -450,6 +486,7 @@ async function loadData(){
     dataStore.menMainDraw=Array.isArray(dataStore.menMainDraw)?dataStore.menMainDraw:[];
     dataStore.womenMainDraw=Array.isArray(dataStore.womenMainDraw)?dataStore.womenMainDraw:[];
     dataStore.menDoubleOut=Array.isArray(dataStore.menDoubleOut)?dataStore.menDoubleOut:[];
+    dataStore.menPlacementDoubleOut=Array.isArray(dataStore.menPlacementDoubleOut)?dataStore.menPlacementDoubleOut:[];
     dataStore.womenDoubleOut=Array.isArray(dataStore.womenDoubleOut)?dataStore.womenDoubleOut:[];
 
     if(dataStore.updated){
