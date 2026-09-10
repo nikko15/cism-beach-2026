@@ -305,6 +305,78 @@
   .schedule-day-content{padding:0 9px 9px}
 }
 
+
+/* ===== Collapsible Pool Standings & Main Draw sections ===== */
+.content-section-shell{
+  border:1px solid var(--line);
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:var(--shadow);
+}
+
+.content-section-toggle{
+  width:100%;
+  border:0;
+  background:#eef3f8;
+  color:var(--primary);
+  padding:15px 17px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  cursor:pointer;
+  font:inherit;
+  text-align:left;
+}
+
+.content-section-toggle:hover{background:#e6edf5}
+
+.content-section-toggle-title{
+  font-size:1.18rem;
+  font-weight:950;
+}
+
+.content-section-toggle-meta{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#66788a;
+  font-size:.78rem;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.content-section-chevron{
+  display:inline-block;
+  font-size:1.05rem;
+  transition:transform .18s ease;
+}
+
+.content-section-shell.collapsed .content-section-chevron{
+  transform:rotate(-90deg);
+}
+
+.content-section-body{
+  padding:14px;
+}
+
+.content-section-shell.collapsed .content-section-body{
+  display:none;
+}
+
+.content-section-body .pools,
+.content-section-body .draw-groups{
+  gap:14px;
+}
+
+@media(max-width:720px){
+  .content-section-toggle{padding:13px 14px}
+  .content-section-toggle-title{font-size:1.02rem}
+  .content-section-toggle-meta{font-size:.68rem}
+  .content-section-body{padding:10px}
+}
+
 </style>
 </head>
 <body>
@@ -314,9 +386,9 @@
 
     <div class="hero-copy">
       <div class="eyebrow">CISM</div>
-      <h1>BeachCup 2026</h1>
+      <h1>Beach Volleyball 2026</h1>
       <p class="hero-subtitle">Live Schedule, Results &amp; Standings</p>
-      <div class="hero-location">14–18 SEPTEMBER 2026&nbsp;&nbsp; | &nbsp;&nbsp;WARENDORF, GERMANY</div>
+      <div class="hero-location">15–17 SEPTEMBER 2026&nbsp;&nbsp; | &nbsp;&nbsp;WARENDORF, GERMANY</div>
     </div>
 
     <div class="live-pill"><span class="live-dot"></span>LIVE RESULTS</div>
@@ -352,23 +424,67 @@
   </section>
 
   <section id="men-standings" class="section">
-    <h2 class="division-title">Men · Pool Standings</h2>
-    <div id="menPools" class="pools"><div class="loading">Loading standings…</div></div>
+    <div class="content-section-shell" data-collapsible-section="men-standings">
+      <button class="content-section-toggle" type="button"
+              onclick="toggleContentSection('men-standings')" aria-expanded="true">
+        <span class="content-section-toggle-title">Men · Pool Standings</span>
+        <span class="content-section-toggle-meta">
+          <span>Show / hide</span>
+          <span class="content-section-chevron">▼</span>
+        </span>
+      </button>
+      <div class="content-section-body">
+        <div id="menPools" class="pools"><div class="loading">Loading standings…</div></div>
+      </div>
+    </div>
   </section>
 
   <section id="women-standings" class="section">
-    <h2 class="division-title">Women · Pool Standings</h2>
-    <div id="womenPools" class="pools"><div class="loading">Loading standings…</div></div>
+    <div class="content-section-shell" data-collapsible-section="women-standings">
+      <button class="content-section-toggle" type="button"
+              onclick="toggleContentSection('women-standings')" aria-expanded="true">
+        <span class="content-section-toggle-title">Women · Pool Standings</span>
+        <span class="content-section-toggle-meta">
+          <span>Show / hide</span>
+          <span class="content-section-chevron">▼</span>
+        </span>
+      </button>
+      <div class="content-section-body">
+        <div id="womenPools" class="pools"><div class="loading">Loading standings…</div></div>
+      </div>
+    </div>
   </section>
 
   <section id="men-main-draw" class="section">
-    <h2 class="division-title">Men · Main Draw</h2>
-    <div id="menMainDraw" class="draw-groups"><div class="loading">Loading main draw…</div></div>
+    <div class="content-section-shell" data-collapsible-section="men-main-draw">
+      <button class="content-section-toggle" type="button"
+              onclick="toggleContentSection('men-main-draw')" aria-expanded="true">
+        <span class="content-section-toggle-title">Men · Main Draw</span>
+        <span class="content-section-toggle-meta">
+          <span>Show / hide</span>
+          <span class="content-section-chevron">▼</span>
+        </span>
+      </button>
+      <div class="content-section-body">
+        <div id="menMainDraw" class="draw-groups"><div class="loading">Loading main draw…</div></div>
+      </div>
+    </div>
   </section>
 
   <section id="women-main-draw" class="section">
-    <h2 class="division-title">Women · Main Draw</h2>
-    <div id="womenMainDraw" class="draw-groups"><div class="loading">Loading main draw…</div></div>
+    <div class="content-section-shell" data-collapsible-section="women-main-draw">
+      <button class="content-section-toggle" type="button"
+              onclick="toggleContentSection('women-main-draw')" aria-expanded="true">
+        <span class="content-section-toggle-title">Women · Main Draw</span>
+        <span class="content-section-toggle-meta">
+          <span>Show / hide</span>
+          <span class="content-section-chevron">▼</span>
+        </span>
+      </button>
+      <div class="content-section-body">
+        <div id="womenMainDraw" class="draw-groups"><div class="loading">Loading main draw…</div></div>
+      </div>
+    </div>
   </section>
 
   <section id="double-out" class="section" hidden>
@@ -406,9 +522,29 @@ let activeDoubleOutGender="men";
 let activeMenBracket="championship";
 let activeFilter="ALL";
 let collapsedScheduleDays=new Set();
+let collapsedContentSections=new Set();
 
 function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
 function gender(v){v=String(v??"").trim().toUpperCase();if(v.startsWith("M"))return"M";if(v.startsWith("W")||v.startsWith("F"))return"W";return v}
+
+
+function toggleContentSection(sectionId){
+  const shell=document.querySelector(`[data-collapsible-section="${sectionId}"]`);
+  if(!shell)return;
+
+  if(collapsedContentSections.has(sectionId)){
+    collapsedContentSections.delete(sectionId);
+    shell.classList.remove("collapsed");
+  }else{
+    collapsedContentSections.add(sectionId);
+    shell.classList.add("collapsed");
+  }
+
+  const btn=shell.querySelector(".content-section-toggle");
+  if(btn){
+    btn.setAttribute("aria-expanded", collapsedContentSections.has(sectionId) ? "false" : "true");
+  }
+}
 
 function toggleScheduleDay(day){
   if(collapsedScheduleDays.has(day)){
