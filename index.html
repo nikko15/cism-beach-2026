@@ -769,8 +769,32 @@ function renderMainDraw(targetId,matches){
 }
 
 
+function normalizeScheduleTeam(name){
+  return String(name||"")
+    .replace(/\s*\[[^\]]+\]\s*$/,"")
+    .trim()
+    .toLowerCase();
+}
+
+function doubleOutMatchTime(m){
+  const t1=normalizeScheduleTeam(m.team1);
+  const t2=normalizeScheduleTeam(m.team2);
+
+  if(!t1 || !t2 || t1==="tbd" || t2==="tbd") return "";
+
+  const hit=(dataStore.schedule||[]).find(s=>{
+    const s1=normalizeScheduleTeam(s.team1);
+    const s2=normalizeScheduleTeam(s.team2);
+
+    return (s1===t1 && s2===t2) || (s1===t2 && s2===t1);
+  });
+
+  return hit ? String(hit.time||"").trim() : "";
+}
+
 function doMatchCard(m){
   const result=String(m.result||"").trim();
+  const matchTime=doubleOutMatchTime(m);
   const [w1,w2]=result.includes(":")?result.split(":").map(Number):[null,null];
   const winner1=m.played && w1!==null && w1>w2;
   const winner2=m.played && w2!==null && w2>w1;
@@ -790,7 +814,7 @@ function doMatchCard(m){
 
   return `<article class="do-match">
     <div class="do-match-top">
-      <span>Match ${esc(m.match)}</span>
+      <span>Match ${esc(m.match)}${matchTime?` · ${esc(matchTime)}`:""}</span>
       <span><i class="do-status ${m.played?"live":""}"></i>${m.played?"RESULT":"UPCOMING"}</span>
     </div>
     ${teamRow(m.team1,sets1,w1,winner1)}
