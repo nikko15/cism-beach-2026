@@ -788,41 +788,39 @@ function formatDoubleOutCourt(court){
   return c;
 }
 
-function isDoubleOutScheduleMatch(s){
-  const label=String(s?.match||"").trim().toUpperCase();
-
-  // Nur echte Double-Out-/K.-o.-Zeilen zulassen.
-  // Dadurch kann ein früheres Poolspiel derselben Teams nicht versehentlich
-  // als Quelle für Uhrzeit und Court verwendet werden.
-  return (
-    label.includes("DOUBLE OUT") ||
-    /^DO\b/.test(label) ||
-    label.includes(" DO ") ||
-    label.includes("- DO ") ||
-    label.includes("DO MEN") ||
-    label.includes("DO WOMEN")
-  );
-}
-
 function doubleOutMatchMeta(m){
   const t1=normalizeScheduleTeam(m.team1);
   const t2=normalizeScheduleTeam(m.team2);
 
   if(!t1 || !t2 || t1==="tbd" || t2==="tbd") return {time:"",court:""};
 
-  const hit=(dataStore.schedule||[]).find(s=>{
-    if(!isDoubleOutScheduleMatch(s))return false;
-
+  // Alle Schedule-Zeilen mit exakt dieser Team-Paarung sammeln.
+  // Wichtig: dieselben Teams können sich schon in der Poolphase begegnet sein.
+  const candidates=(dataStore.schedule||[]).filter(s=>{
     const s1=normalizeScheduleTeam(s.team1);
     const s2=normalizeScheduleTeam(s.team2);
-
     return (s1===t1 && s2===t2) || (s1===t2 && s2===t1);
   });
 
-  return hit ? {
+  if(!candidates.length) return {time:"",court:""};
+
+  // Wenn möglich zusätzlich die Double-Out-Matchnummer aus dem Schedule-Text
+  // verwenden (z. B. "... MATCH 3"). Das trennt ein späteres K.-o.-Spiel
+  // zuverlässig von einem früheren Poolspiel derselben Teams.
+  const matchNo=String(m.match||"").trim();
+  const matchRx=new RegExp(`(?:MATCH\\s*)?${matchNo}(?!\\d)`, "i");
+
+  const numbered=candidates.filter(s=>matchRx.test(String(s.match||"").trim()));
+
+  // Falls der Schedule-Text keine brauchbare Matchnummer enthält:
+  // den LETZTEN Treffer nehmen. Der Double Out liegt zeitlich nach den
+  // Poolspielen und steht deshalb später im exportierten Schedule.
+  const hit=(numbered.length ? numbered[numbered.length-1] : candidates[candidates.length-1]);
+
+  return {
     time:String(hit.time||"").trim(),
     court:formatDoubleOutCourt(hit.court)
-  } : {time:"",court:""};
+  };
 }
 
 function doMatchCard(m){
