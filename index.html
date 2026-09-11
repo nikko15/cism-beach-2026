@@ -388,6 +388,76 @@
   .content-section-body{padding:10px}
 }
 
+
+    .print-pdf-btn{margin-left:auto}
+
+    @media print{
+      @page{size:A4 portrait;margin:10mm}
+      html,body{background:#fff!important;color:#111!important}
+      body{font-size:10pt}
+      .print-pdf-btn,
+      .filters .filter-btn:not(.print-pdf-btn),
+      .do-gender-tabs,
+      .do-subtabs,
+      .content-section-toggle-meta,
+      .schedule-day-toggle-meta{
+        display:none!important;
+      }
+      header,.hero,.site-header{
+        background:#fff!important;
+        color:#111!important;
+        box-shadow:none!important;
+      }
+      header *, .hero *, .site-header *{color:#111!important}
+      .section{break-inside:auto;page-break-inside:auto;margin:0 0 10mm!important}
+      .content-section-shell,
+      .card,
+      .pool-card,
+      .seed-table,
+      .do-shell{
+        box-shadow:none!important;
+        border-color:#bbb!important;
+        background:#fff!important;
+      }
+      .content-section-body,
+      .schedule-day-body{
+        display:block!important;
+        max-height:none!important;
+        height:auto!important;
+        overflow:visible!important;
+      }
+      .content-section-shell.collapsed .content-section-body,
+      .schedule-day-group.collapsed .schedule-day-body{
+        display:block!important;
+      }
+      .content-section-toggle,
+      .schedule-day-toggle{
+        background:#fff!important;
+        color:#111!important;
+        border-bottom:1px solid #bbb!important;
+      }
+      .content-section-toggle-title,
+      .schedule-day-toggle-title,
+      .division-title,
+      h1,h2,h3,h4{color:#111!important}
+      .schedule-row,
+      .standing-row,
+      .seed-row,
+      .match-card{
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
+      .double-out-board,
+      .do-body,
+      .do-grid{
+        overflow:visible!important;
+        width:100%!important;
+        max-width:none!important;
+      }
+      a{color:#111!important;text-decoration:none!important}
+      *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    }
+
 </style>
 </head>
 <body>
@@ -424,12 +494,12 @@
       <div class="section-head">
         <h2 class="section-title" style="margin:0">Schedule & Results</h2>
         <div class="updated" id="updatedText">Loading data…</div>
-        <button class="print-pdf-btn" type="button" onclick="printTournamentPage()">Print / PDF</button>
       </div>
       <div class="filters">
         <button class="filter-btn active" data-filter="ALL">All</button>
         <button class="filter-btn" data-filter="M">Men</button>
         <button class="filter-btn" data-filter="W">Women</button>
+        <button class="filter-btn print-pdf-btn" type="button" onclick="printTournamentPage()">Print / PDF</button>
       </div>
       <div id="scheduleList" class="schedule-list"><div class="loading">Loading tournament data…</div></div>
     </div>
@@ -1083,8 +1153,6 @@ document.querySelectorAll(".do-subtab-btn").forEach(btn=>{
 
 
 function printTournamentPage(){
-  // Browser print dialog. Print-CSS forces all collapsible sections open
-  // and removes website controls from the printed/PDF version.
   window.print();
 }
 
@@ -1149,20 +1217,4 @@ loadData();
 setInterval(loadData,60000);
 </script>
 </body>
-</html>.print-pdf-btn{
-      border:1px solid var(--line);
-      background:#fff;
-      color:inherit;
-      padding:8px 12px;
-      border-radius:999px;
-      font:inherit;
-      font-weight:700;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .print-pdf-btn:hover{
-      background:var(--primary);
-      color:#fff;
-      border-color:var(--primary);
-    }
-    .print-pdf-btn:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+</html>
