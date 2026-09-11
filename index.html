@@ -55,6 +55,13 @@
     .standing-head,.standing-row{display:grid;grid-template-columns:42px minmax(180px,2fr) 58px 80px 100px 120px;align-items:center}
     .standing-head{background:#eef2f7;color:#526177;font-size:.73rem;font-weight:800;text-transform:uppercase}
     .standing-head>div,.standing-row>div{padding:9px 10px}
+    .seed-table{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+    .seed-head,.seed-row{display:grid;grid-template-columns:58px minmax(190px,2fr) 72px 64px 92px 110px 125px;align-items:center}
+    .seed-head{background:#eef2f7;color:#526177;font-size:.73rem;font-weight:800;text-transform:uppercase}
+    .seed-head>div,.seed-row>div{padding:9px 10px}
+    .seed-row{border-top:1px solid var(--line);font-size:.88rem}
+    .seed-rank{font-weight:900;color:var(--navy)}
+    .seed-section-break{background:#f7f9fc;color:#40516a;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-top:1px solid var(--line)}
     .standing-row{border-top:1px solid var(--line);font-size:.9rem}
     .standing-row:first-of-type{border-top:none}
     .rank{font-weight:900;text-align:center}
@@ -127,6 +134,10 @@
       .hero-inner{flex-direction:column}
       .quick{grid-template-columns:1fr}
       .standing-head{display:none}
+      .seed-head{display:none}
+      .seed-row{grid-template-columns:42px 1fr 58px;gap:0}
+      .seed-row>div{padding:7px 8px}
+      .seed-row .seed-hide-mobile{display:none}
       .standing-row{display:grid;grid-template-columns:38px 1fr;gap:0;padding:12px}
       .standing-row>div{padding:3px 5px}
       .standing-row .rank{grid-row:1/5;align-self:start;font-size:1.15rem;padding-top:5px}
@@ -439,6 +450,22 @@
     </div>
   </section>
 
+  <section id="men-seeds-section" class="section" hidden>
+    <div class="content-section-shell" data-collapsible-section="men-seeds">
+      <button class="content-section-toggle" type="button"
+              onclick="toggleContentSection('men-seeds')" aria-expanded="true">
+        <span class="content-section-toggle-title">Men · Seeds after Pool Play</span>
+        <span class="content-section-toggle-meta">
+          <span>Show / hide</span>
+          <span class="content-section-chevron">▼</span>
+        </span>
+      </button>
+      <div class="content-section-body">
+        <div id="menSeeds"><div class="loading">Loading seeds…</div></div>
+      </div>
+    </div>
+  </section>
+
   <section id="women-standings" class="section">
     <div class="content-section-shell" data-collapsible-section="women-standings">
       <button class="content-section-toggle" type="button"
@@ -451,6 +478,22 @@
       </button>
       <div class="content-section-body">
         <div id="womenPools" class="pools"><div class="loading">Loading standings…</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="women-seeds-section" class="section" hidden>
+    <div class="content-section-shell" data-collapsible-section="women-seeds">
+      <button class="content-section-toggle" type="button"
+              onclick="toggleContentSection('women-seeds')" aria-expanded="true">
+        <span class="content-section-toggle-title">Women · Seeds after Pool Play</span>
+        <span class="content-section-toggle-meta">
+          <span>Show / hide</span>
+          <span class="content-section-chevron">▼</span>
+        </span>
+      </button>
+      <div class="content-section-body">
+        <div id="womenSeeds"><div class="loading">Loading seeds…</div></div>
       </div>
     </div>
   </section>
@@ -517,7 +560,7 @@
 </main>
 
 <script>
-let dataStore={schedule:[],menPools:[],womenPools:[],menMainDraw:[],womenMainDraw:[],doubleOutPublished:false,menDoubleOut:[],menPlacementDoubleOut:[],womenDoubleOut:[]};
+let dataStore={schedule:[],menPools:[],womenPools:[],poolPlayComplete:false,menSeeds:[],womenSeeds:[],menMainDraw:[],womenMainDraw:[],doubleOutPublished:false,menDoubleOut:[],menPlacementDoubleOut:[],womenDoubleOut:[]};
 let activeDoubleOutGender="men";
 let activeMenBracket="championship";
 let activeFilter="ALL";
@@ -724,6 +767,61 @@ function renderPools(targetId,pools){
         </div>`).join("")}
     </article>`;
   }).join("");
+}
+
+
+function renderSeeds(targetId,seeds){
+  const box=document.getElementById(targetId);
+  if(!box)return;
+
+  if(!Array.isArray(seeds)||!seeds.length){
+    box.innerHTML='<div class="card empty-state">Seeds are not available yet.</div>';
+    return;
+  }
+
+  let lastSection="";
+  const rows=seeds.map(s=>{
+    const section=String(s.section||"").replace(/\s+/g," ").trim();
+    const sectionHtml=(section && section!==lastSection)
+      ? `<div class="seed-section-break">${esc(section)}</div>`
+      : "";
+    if(section)lastSection=section;
+
+    return `${sectionHtml}
+      <div class="seed-row">
+        <div class="seed-rank">${esc(s.seed)}</div>
+        <div class="team-cell"><div class="team-name">${esc(s.team)}</div><div class="country">${esc(s.country)}</div></div>
+        <div>${esc(s.pts)}</div>
+        <div class="seed-hide-mobile">${esc(s.matchesWon)}–${esc(s.matchesLost)}</div>
+        <div class="seed-hide-mobile">${esc(s.setsWon)}–${esc(s.setsLost)} <small>${esc(s.setRatio)}</small></div>
+        <div class="seed-hide-mobile">${esc(s.pointsWon)}–${esc(s.pointsLost)} <small>${esc(s.pointRatio)}</small></div>
+        <div class="seed-hide-mobile">${esc(s.country)}</div>
+      </div>`;
+  }).join("");
+
+  box.innerHTML=`
+    <div class="seed-table">
+      <div class="seed-head">
+        <div>Seed</div><div>Team</div><div>PTS</div><div>Matches W-L</div>
+        <div>Sets W-L / Ratio</div><div>Points W-L / Ratio</div><div>Nation</div>
+      </div>
+      ${rows}
+    </div>`;
+}
+
+function renderSeedSections(){
+  const complete=Boolean(dataStore.poolPlayComplete);
+  const menSection=document.getElementById("men-seeds-section");
+  const womenSection=document.getElementById("women-seeds-section");
+
+  const menVisible=complete && Array.isArray(dataStore.menSeeds) && dataStore.menSeeds.length>0;
+  const womenVisible=complete && Array.isArray(dataStore.womenSeeds) && dataStore.womenSeeds.length>0;
+
+  if(menSection)menSection.hidden=!menVisible;
+  if(womenSection)womenSection.hidden=!womenVisible;
+
+  if(menVisible)renderSeeds("menSeeds",dataStore.menSeeds);
+  if(womenVisible)renderSeeds("womenSeeds",dataStore.womenSeeds);
 }
 
 
@@ -990,6 +1088,9 @@ async function loadData(){
     dataStore.schedule=Array.isArray(dataStore.schedule)?dataStore.schedule:[];
     dataStore.menPools=Array.isArray(dataStore.menPools)?dataStore.menPools:[];
     dataStore.womenPools=Array.isArray(dataStore.womenPools)?dataStore.womenPools:[];
+    dataStore.poolPlayComplete=Boolean(dataStore.poolPlayComplete);
+    dataStore.menSeeds=Array.isArray(dataStore.menSeeds)?dataStore.menSeeds:[];
+    dataStore.womenSeeds=Array.isArray(dataStore.womenSeeds)?dataStore.womenSeeds:[];
     dataStore.menMainDraw=Array.isArray(dataStore.menMainDraw)?dataStore.menMainDraw:[];
     dataStore.womenMainDraw=Array.isArray(dataStore.womenMainDraw)?dataStore.womenMainDraw:[];
     dataStore.menDoubleOut=Array.isArray(dataStore.menDoubleOut)?dataStore.menDoubleOut:[];
@@ -1008,6 +1109,11 @@ async function loadData(){
     // WOMEN: only Pools I–L are used.
     // Suppress the empty Pool M / Pool N tables on the website.
     renderPools("womenPools",dataStore.womenPools.slice(0,4));
+
+    // Seed sections become visible only after the exporter confirms that
+    // every Tuesday pool match has a result.
+    renderSeedSections();
+
     renderMainDraw("menMainDraw",dataStore.menMainDraw);
 
     // WOMEN: only the populated Main Draw area through Excel row 30.
