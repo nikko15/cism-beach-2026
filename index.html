@@ -424,6 +424,7 @@
       <div class="section-head">
         <h2 class="section-title" style="margin:0">Schedule & Results</h2>
         <div class="updated" id="updatedText">Loading data…</div>
+        <button class="print-pdf-btn" type="button" onclick="printTournamentPage()">Print / PDF</button>
       </div>
       <div class="filters">
         <button class="filter-btn active" data-filter="ALL">All</button>
@@ -1079,6 +1080,13 @@ document.querySelectorAll(".do-subtab-btn").forEach(btn=>{
     renderDoubleOut();
   });
 });
+
+
+function printTournamentPage(){
+  // Browser print dialog. Print-CSS forces all collapsible sections open
+  // and removes website controls from the printed/PDF version.
+  window.print();
+}
 
 async function loadData(){
   try{
