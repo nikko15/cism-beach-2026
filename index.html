@@ -458,6 +458,28 @@
       *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
     }
 
+
+    .player-search-card{padding:18px}
+    .player-search-row{display:flex;gap:10px;align-items:center}
+    .player-search-input{
+      flex:1;min-width:0;border:1px solid var(--line);background:#fff;
+      border-radius:999px;padding:11px 16px;font:inherit;color:inherit;outline:none
+    }
+    .player-search-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(22,54,92,.08)}
+    .player-search-clear{display:none}
+    .player-search-clear.visible{display:inline-block}
+    .search-hint{margin-top:8px;color:var(--muted);font-size:.82rem}
+    .search-results{display:grid;gap:14px;margin-top:16px}
+    .search-result-group{border-top:1px solid var(--line);padding-top:13px}
+    .search-result-title{font-weight:950;color:var(--primary);margin-bottom:8px}
+    .search-result-item{padding:10px 12px;border:1px solid var(--line);border-radius:13px;background:#fbfcfe;margin-top:7px}
+    .search-result-meta{font-size:.76rem;color:var(--muted);margin-bottom:4px;font-weight:800}
+    .search-result-main{font-weight:800}
+    .search-result-sub{font-size:.82rem;color:var(--muted);margin-top:3px}
+    .search-summary{font-weight:850;color:var(--primary)}
+    @media(max-width:620px){.player-search-row{flex-wrap:wrap}.player-search-input{flex-basis:100%}}
+    @media print{#player-search-section{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -477,6 +499,22 @@
 </header>
 
 <main class="wrap">
+  <section id="player-search-section" class="section">
+    <div class="card player-search-card">
+      <div class="section-head">
+        <h2 class="section-title" style="margin:0">Find your matches</h2>
+      </div>
+      <div class="player-search-row">
+        <input id="playerSearchInput" class="player-search-input" type="search"
+               placeholder="Search player, team or nation…" autocomplete="off"
+               aria-label="Search player, team or nation">
+        <button id="playerSearchClear" class="filter-btn player-search-clear" type="button">Clear</button>
+      </div>
+      <div class="search-hint">Enter a player surname, team name or nation, e.g. Schürholz or GER.</div>
+      <div id="playerSearchResults" class="search-results" hidden></div>
+    </div>
+  </section>
+
   <section class="section">
     <h2 class="section-title">Quick access</h2>
     <div class="quick">
@@ -1152,6 +1190,106 @@ document.querySelectorAll(".do-subtab-btn").forEach(btn=>{
 });
 
 
+
+function searchNorm(v){
+  return String(v??"").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/ß/g,"ss");
+}
+function searchHit(q,...values){
+  return values.some(v=>searchNorm(v).includes(q));
+}
+function searchMatchItem(m,label){
+  const result=String(m.result||"").trim()||"Upcoming";
+  const when=[m.date,m.time,m.court].filter(Boolean).join(" · ");
+  return `<div class="search-result-item">
+    <div class="search-result-meta">${esc(label)}${when?` · ${esc(when)}`:""}</div>
+    <div class="search-result-main">${esc(m.team1||"TBD")} <strong>${esc(result)}</strong> ${esc(m.team2||"TBD")}</div>
+    ${m.match?`<div class="search-result-sub">${esc(m.match)}</div>`:""}
+  </div>`;
+}
+function renderPlayerSearch(){
+  const input=document.getElementById("playerSearchInput");
+  const box=document.getElementById("playerSearchResults");
+  const clear=document.getElementById("playerSearchClear");
+  if(!input||!box)return;
+
+  const raw=input.value.trim();
+  const q=searchNorm(raw);
+  clear?.classList.toggle("visible",raw.length>0);
+
+  if(q.length<2){box.hidden=true;box.innerHTML="";return;}
+
+  const schedule=(dataStore.schedule||[]).filter(m=>searchHit(q,m.team1,m.team2,m.gender));
+  const menMain=(dataStore.menMainDraw||[]).filter(m=>searchHit(q,m.team1,m.team2));
+  const womenMain=(dataStore.womenMainDraw||[]).filter(m=>searchHit(q,m.team1,m.team2));
+  const menDO=[...(dataStore.menDoubleOut||[]),...(dataStore.menPlacementDoubleOut||[])]
+    .filter(m=>searchHit(q,m.team1,m.team2));
+  const womenDO=(dataStore.womenDoubleOut||[]).filter(m=>searchHit(q,m.team1,m.team2));
+
+  const poolTeams=[];
+  [...(dataStore.menPools||[]),...(dataStore.womenPools||[])].forEach(pool=>{
+    (pool.teams||[]).forEach(t=>{
+      if(searchHit(q,t.team,t.country))poolTeams.push({...t,pool:pool.pool});
+    });
+  });
+
+  const seeds=[...(dataStore.menSeeds||[]),...(dataStore.womenSeeds||[])]
+    .filter(t=>searchHit(q,t.team,t.country));
+
+  // Schedule is the primary list of actual fixtures. Main Draw / Double Out
+  // are shown separately as tournament context.
+  const groups=[];
+  if(schedule.length)groups.push(`<div class="search-result-group">
+    <div class="search-result-title">Schedule & Results · ${schedule.length}</div>
+    ${schedule.map(m=>searchMatchItem(m,"Schedule")).join("")}
+  </div>`);
+  if(poolTeams.length)groups.push(`<div class="search-result-group">
+    <div class="search-result-title">Pool Standings · ${poolTeams.length}</div>
+    ${poolTeams.map(t=>`<div class="search-result-item">
+      <div class="search-result-meta">${esc(t.pool||"Pool")}</div>
+      <div class="search-result-main">${esc(t.team)} ${t.country?`[${esc(t.country)}]`:""}</div>
+      <div class="search-result-sub">PTS ${esc(t.pts)} · Matches ${esc(t.matchesWon)}–${esc(t.matchesLost)} · Sets ${esc(t.setsWon)}–${esc(t.setsLost)}</div>
+    </div>`).join("")}
+  </div>`);
+  if(seeds.length)groups.push(`<div class="search-result-group">
+    <div class="search-result-title">Seeds after Pool Play · ${seeds.length}</div>
+    ${seeds.map(t=>`<div class="search-result-item">
+      <div class="search-result-meta">${esc(t.section||"Seed")}</div>
+      <div class="search-result-main">#${esc(t.seed)} · ${esc(t.team)} ${t.country?`[${esc(t.country)}]`:""}</div>
+    </div>`).join("")}
+  </div>`);
+  if(menMain.length||womenMain.length)groups.push(`<div class="search-result-group">
+    <div class="search-result-title">Main Draw · ${menMain.length+womenMain.length}</div>
+    ${menMain.map(m=>searchMatchItem(m,"Men · Main Draw")).join("")}
+    ${womenMain.map(m=>searchMatchItem(m,"Women · Main Draw")).join("")}
+  </div>`);
+  if(menDO.length||womenDO.length)groups.push(`<div class="search-result-group">
+    <div class="search-result-title">Double Out · ${menDO.length+womenDO.length}</div>
+    ${menDO.map(m=>searchMatchItem(m,"Men · Double Out")).join("")}
+    ${womenDO.map(m=>searchMatchItem(m,"Women · Double Out")).join("")}
+  </div>`);
+
+  box.hidden=false;
+  box.innerHTML=groups.length
+    ? `<div class="search-summary">Results for “${esc(raw)}”</div>${groups.join("")}`
+    : `<div class="empty-state">No matches or teams found for “${esc(raw)}”.</div>`;
+}
+
+let playerSearchTimer=null;
+document.addEventListener("input",e=>{
+  if(e.target?.id!=="playerSearchInput")return;
+  clearTimeout(playerSearchTimer);
+  playerSearchTimer=setTimeout(renderPlayerSearch,120);
+});
+document.addEventListener("click",e=>{
+  if(e.target?.id!=="playerSearchClear")return;
+  const input=document.getElementById("playerSearchInput");
+  if(input){input.value="";input.focus();}
+  renderPlayerSearch();
+});
+
+
 function printTournamentPage(){
   window.print();
 }
@@ -1197,6 +1335,7 @@ async function loadData(){
     renderMainDraw("womenMainDraw",dataStore.womenMainDraw.slice(0,24));
 
     renderDoubleOut();
+    renderPlayerSearch();
   }catch(e){
     document.getElementById("updatedText").textContent="Data unavailable";
     document.getElementById("scheduleList").innerHTML='<div class="error-state">The live tournament data could not be loaded.</div>';
