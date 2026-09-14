@@ -579,7 +579,7 @@
     <div class="content-section-shell" data-collapsible-section="women-standings">
       <button class="content-section-toggle" type="button"
               onclick="toggleContentSection('women-standings')" aria-expanded="true">
-        <span class="content-section-toggle-title">Women · Pool Standings</span>
+        <span class="content-section-toggle-title">Women · Pool Standings · 2 Groups</span>
         <span class="content-section-toggle-meta">
           <span>Show / hide</span>
           <span class="content-section-chevron">▼</span>
@@ -627,7 +627,7 @@
     <div class="content-section-shell" data-collapsible-section="women-main-draw">
       <button class="content-section-toggle" type="button"
               onclick="toggleContentSection('women-main-draw')" aria-expanded="true">
-        <span class="content-section-toggle-title">Women · Main Draw</span>
+        <span class="content-section-toggle-title">Women · Main Draw · 2 × 6 Teams</span>
         <span class="content-section-toggle-meta">
           <span>Show / hide</span>
           <span class="content-section-chevron">▼</span>
@@ -1090,12 +1090,68 @@ function renderDoubleOut(){
   let all=[];
   let bracketTitle="";
   let bracketSubtitle="";
+  const board=document.getElementById("doubleOutBoard");
 
   if(activeDoubleOutGender==="women"){
     all=dataStore.womenDoubleOut;
-    bracketTitle="Women · Championship Bracket";
-    bracketSubtitle="Complete double-out bracket";
-  }else if(activeMenBracket==="placement"){
+    bracketTitle="Women · Double Out 8";
+    bracketSubtitle="8-team double-out bracket from the new women’s 6-team pool format";
+
+    if(!Array.isArray(all)||!all.length){
+      board.innerHTML='<div class="empty-state">Bracket data is not available yet.</div>';
+      return;
+    }
+
+    const wOpen=matchesByNums(all,[1,2,3,4]);
+    const wRound2=matchesByNums(all,[9,10]);
+    const wQual=matchesByNums(all,[12]);
+    const lRound1=matchesByNums(all,[5,6,7,8]);
+    const lRound2=matchesByNums(all,[11]);
+    const lQual=matchesByNums(all,[13]);
+    const bronze=matchesByNums(all,[29]);
+    const final=matchesByNums(all,[30]);
+
+    board.innerHTML=`
+      <div class="do-lane">
+        <div class="do-lane-title">${esc(bracketTitle)} · Winners Bracket</div>
+        <div class="do-help" style="margin:0 0 12px 0">${esc(bracketSubtitle)}</div>
+        <div class="do-flow">
+          ${doRound("Opening Round",wOpen)}
+          <div class="do-arrow">›</div>
+          ${doRound("Winners Round 2",wRound2)}
+          <div class="do-arrow">›</div>
+          ${doRound("Qualification",wQual)}
+        </div>
+      </div>
+
+      <div class="do-lane">
+        <div class="do-lane-title">Losers Bracket</div>
+        <div class="do-flow">
+          ${doRound("Losers Round 1",lRound1)}
+          <div class="do-arrow">›</div>
+          ${doRound("Losers Round 2",lRound2)}
+          <div class="do-arrow">›</div>
+          ${doRound("Qualification",lQual)}
+        </div>
+      </div>
+
+      <div class="do-lane">
+        <div class="do-lane-title">Medal Matches</div>
+        <div class="do-medals">
+          <div class="do-medal-card">
+            <div class="do-medal-label">🥉 Bronze Medal Match · Match 29</div>
+            ${bronze.map(doMatchCard).join("")}
+          </div>
+          <div class="do-medal-card final">
+            <div class="do-medal-label">🏆 Final · Match 30</div>
+            ${final.map(doMatchCard).join("")}
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if(activeMenBracket==="placement"){
     all=dataStore.menPlacementDoubleOut;
     bracketTitle="Men · Placement Bracket · Places 17–32";
     bracketSubtitle="Independent placement tournament";
@@ -1104,8 +1160,6 @@ function renderDoubleOut(){
     bracketTitle="Men · Championship Bracket · Places 1–16";
     bracketSubtitle="Independent championship tournament";
   }
-
-  const board=document.getElementById("doubleOutBoard");
 
   if(!Array.isArray(all)||!all.length){
     board.innerHTML='<div class="empty-state">Bracket data is not available yet.</div>';
@@ -1320,7 +1374,7 @@ async function loadData(){
 
     // WOMEN: only Pools I–L are used.
     // Suppress the empty Pool M / Pool N tables on the website.
-    renderPools("womenPools",dataStore.womenPools.slice(0,4));
+    renderPools("womenPools",dataStore.womenPools.slice(0,2));
 
     // Seed sections become visible only after the exporter confirms that
     // every Tuesday pool match has a result.
@@ -1330,7 +1384,7 @@ async function loadData(){
 
     // WOMEN: only the populated Main Draw area through Excel row 30.
     // This suppresses the empty Pool M / Pool N area.
-    renderMainDraw("womenMainDraw",dataStore.womenMainDraw.slice(0,24));
+    renderMainDraw("womenMainDraw",dataStore.womenMainDraw);
 
     renderDoubleOut();
     renderPlayerSearch();
