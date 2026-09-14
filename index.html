@@ -579,7 +579,7 @@
     <div class="content-section-shell" data-collapsible-section="women-standings">
       <button class="content-section-toggle" type="button"
               onclick="toggleContentSection('women-standings')" aria-expanded="true">
-        <span class="content-section-toggle-title">Women · Pool Standings · 2 Groups</span>
+        <span class="content-section-toggle-title">Women · Pool Standings · 3 Groups</span>
         <span class="content-section-toggle-meta">
           <span>Show / hide</span>
           <span class="content-section-chevron">▼</span>
@@ -627,7 +627,7 @@
     <div class="content-section-shell" data-collapsible-section="women-main-draw">
       <button class="content-section-toggle" type="button"
               onclick="toggleContentSection('women-main-draw')" aria-expanded="true">
-        <span class="content-section-toggle-title">Women · Main Draw · 2 × 6 Teams</span>
+        <span class="content-section-toggle-title">Women · Main Draw · 3 × 4 Teams</span>
         <span class="content-section-toggle-meta">
           <span>Show / hide</span>
           <span class="content-section-chevron">▼</span>
@@ -1110,7 +1110,7 @@ function renderDoubleOut(){
   if(activeDoubleOutGender==="women"){
     all=dataStore.womenDoubleOut;
     bracketTitle="Women · Double Out 8";
-    bracketSubtitle="8-team double-out bracket from the new women’s 6-team pool format";
+    bracketSubtitle="8-team double-out bracket after the women’s pool phase";
 
     if(!Array.isArray(all)||!all.length){
       board.innerHTML='<div class="empty-state">Bracket data is not available yet.</div>';
@@ -1387,9 +1387,8 @@ async function loadData(){
     renderSchedule();
     renderPools("menPools",dataStore.menPools);
 
-    // WOMEN: only Pools I–L are used.
-    // Suppress the empty Pool M / Pool N tables on the website.
-    renderPools("womenPools",dataStore.womenPools.slice(0,2));
+    // WOMEN: use the three active 4-team pools I, J and K.
+    renderPools("womenPools",dataStore.womenPools.slice(0,3));
 
     // Seed sections become visible only after the exporter confirms that
     // every Tuesday pool match has a result.
@@ -1397,8 +1396,7 @@ async function loadData(){
 
     renderMainDraw("menMainDraw",dataStore.menMainDraw);
 
-    // WOMEN: only the populated Main Draw area through Excel row 30.
-    // This suppresses the empty Pool M / Pool N area.
+    // WOMEN: use the standard 3 x 4-team Main Draw (Pools I, J and K).
     renderMainDraw("womenMainDraw",dataStore.womenMainDraw);
 
     renderDoubleOut();
