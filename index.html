@@ -673,7 +673,7 @@ let dataStore={schedule:[],menPools:[],womenPools:[],poolPlayComplete:false,menS
 let activeDoubleOutGender="men";
 let activeMenBracket="championship";
 let activeFilter="ALL";
-let collapsedScheduleDays=new Set();
+let collapsedScheduleDays=new Set(["2026-09-15"]);
 let collapsedContentSections=new Set();
 
 function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
