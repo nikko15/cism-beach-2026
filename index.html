@@ -997,9 +997,42 @@ function doubleOutMatchMeta(m){
   const matchNo=String(m.match||"").trim();
   const matchRx=matchNo ? new RegExp(`(?:MATCH\\s*)?${matchNo}(?!\\d)`, "i") : null;
 
-  // WOMEN DO8: zuerst direkt über Geschlecht + Matchnummer im Schedule suchen.
-  // Dadurch werden Zeit und Court auch angezeigt, solange in späteren Runden
-  // noch "Winner/Loser of match ..." statt der echten Teams steht.
+  const t1=normalizeScheduleTeam(m.team1);
+  const t2=normalizeScheduleTeam(m.team2);
+
+  /*
+    Zeit/Court werden für Frauen UND Männer direkt aus Schedule & Results
+    übernommen. Vorrang hat die konkrete Team-Paarung; Pool-Spiele werden
+    dabei für Double Out ausgeschlossen.
+  */
+  if(t1 && t2 && t1!=="tbd" && t2!=="tbd"){
+    const candidates=(dataStore.schedule||[]).filter(s=>{
+      const scheduleText=String(s.match||"").trim();
+      if(/\bPOOL\b/i.test(scheduleText))return false;
+
+      const s1=normalizeScheduleTeam(s.team1);
+      const s2=normalizeScheduleTeam(s.team2);
+      return (s1===t1 && s2===t2) || (s1===t2 && s2===t1);
+    });
+
+    if(candidates.length){
+      const numbered=matchRx
+        ? candidates.filter(s=>matchRx.test(String(s.match||"").trim()))
+        : [];
+
+      const hit=(numbered.length ? numbered[numbered.length-1] : candidates[candidates.length-1]);
+      return {
+        time:String(hit.time||"").trim(),
+        court:formatDoubleOutCourt(hit.court)
+      };
+    }
+  }
+
+  /*
+    Frauen-Fallback für noch nicht aufgelöste Winner/Loser-Platzhalter:
+    nur ein eindeutig nummeriertes Frauen-Double-Out-Match aus dem
+    veröffentlichten Schedule verwenden.
+  */
   if(activeDoubleOutGender==="women" && matchRx){
     const womenNumbered=(dataStore.schedule||[]).filter(s=>{
       const scheduleText=String(s.match||"").trim();
@@ -1017,30 +1050,7 @@ function doubleOutMatchMeta(m){
     }
   }
 
-  // MEN + Fallback: bewährte Zuordnung über die konkrete Team-Paarung.
-  const t1=normalizeScheduleTeam(m.team1);
-  const t2=normalizeScheduleTeam(m.team2);
-
-  if(!t1 || !t2 || t1==="tbd" || t2==="tbd") return {time:"",court:""};
-
-  const candidates=(dataStore.schedule||[]).filter(s=>{
-    const s1=normalizeScheduleTeam(s.team1);
-    const s2=normalizeScheduleTeam(s.team2);
-    return (s1===t1 && s2===t2) || (s1===t2 && s2===t1);
-  });
-
-  if(!candidates.length) return {time:"",court:""};
-
-  const numbered=matchRx
-    ? candidates.filter(s=>matchRx.test(String(s.match||"").trim()))
-    : [];
-
-  const hit=(numbered.length ? numbered[numbered.length-1] : candidates[candidates.length-1]);
-
-  return {
-    time:String(hit.time||"").trim(),
-    court:formatDoubleOutCourt(hit.court)
-  };
+  return {time:"",court:""};
 }
 
 function doMatchCard(m){
