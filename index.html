@@ -788,6 +788,28 @@ function renderSchedule(){
   row.result=(t1===alarimi) ? "0-2" : "2-0";
         }
 
+        // Weitere WOMEN-Ergebnisse, website-only.
+        const vanSchie=cleanTeam("Van Schie-Timmer");
+        const hochwind=cleanTeam("Hochwind-Winkler");
+        const valtere=cleanTeam("Valtere-Golovac");
+        const leikuma=cleanTeam("Leikuma-Tijare");
+        const smilgaite=cleanTeam("Smilgaite-Curukova");
+
+        if(originalMatch==="DO WOMEN - MATCH 7" &&
+           ((t1===vanSchie && t2===hochwind) || (t1===hochwind && t2===vanSchie))){
+          row.result=(t1===vanSchie) ? "2-0" : "0-2";
+        }
+
+        if(originalMatch==="DO WOMEN - MATCH 8" &&
+           ((t1===valtere && t2===leikuma) || (t1===leikuma && t2===valtere))){
+          row.result=(t1===valtere) ? "2-0" : "0-2";
+        }
+
+        if(originalMatch==="DO WOMEN - MATCH 13" &&
+           ((t1===vanSchie && t2===smilgaite) || (t1===smilgaite && t2===vanSchie))){
+          row.result=(t1===vanSchie) ? "0-2" : "2-0";
+        }
+
         // Nation für Liva-Eliza ergänzen, falls sie im Schedule fehlt.
         if(t1===liva && !/\[LAT\]\s*$/i.test(String(row.team1||""))){
           row.team1=String(row.team1||"").replace(/\s*\[[^\]]+\]\s*$/,"").replace("Liva.-Eliza","Liva-Eliza").trim()+" [LAT]";
