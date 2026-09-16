@@ -995,32 +995,29 @@ function formatDoubleOutCourt(court){
 
 function doubleOutMatchMeta(m){
   const matchNo=String(m.match||"").trim();
-  const matchRx=matchNo ? new RegExp(`(?:MATCH\\s*)?${matchNo}(?!\\d)`, "i") : null;
 
-  const t1=normalizeScheduleTeam(m.team1);
-  const t2=normalizeScheduleTeam(m.team2);
+  // Zeit/Court zuerst über die EXAKTE Double-Out-Matchnummer
+  // aus den veröffentlichten Schedule-&-Results-Daten bestimmen.
+  const scheduleMatchNumber = s => {
+    const txt=String(s.match||"").trim();
+    if(/\bPOOL\b/i.test(txt))return "";
 
-  /*
-    Zeit/Court werden für Frauen UND Männer direkt aus Schedule & Results
-    übernommen. Vorrang hat die konkrete Team-Paarung; Pool-Spiele werden
-    dabei für Double Out ausgeschlossen.
-  */
-  if(t1 && t2 && t1!=="tbd" && t2!=="tbd"){
-    const candidates=(dataStore.schedule||[]).filter(s=>{
-      const scheduleText=String(s.match||"").trim();
-      if(/\bPOOL\b/i.test(scheduleText))return false;
+    let hit=txt.match(/\bMATCH\s*#?\s*(\d+)\b/i);
+    if(hit)return hit[1];
 
-      const s1=normalizeScheduleTeam(s.team1);
-      const s2=normalizeScheduleTeam(s.team2);
-      return (s1===t1 && s2===t2) || (s1===t2 && s2===t1);
+    hit=txt.match(/^\s*#?\s*(\d+)\s*$/);
+    return hit ? hit[1] : "";
+  };
+
+  if(matchNo){
+    const byNumber=(dataStore.schedule||[]).filter(s=>{
+      if(activeDoubleOutGender==="women" && gender(s.gender)!=="W")return false;
+      if(activeDoubleOutGender==="men" && gender(s.gender)!=="M")return false;
+      return scheduleMatchNumber(s)===matchNo;
     });
 
-    if(candidates.length){
-      const numbered=matchRx
-        ? candidates.filter(s=>matchRx.test(String(s.match||"").trim()))
-        : [];
-
-      const hit=(numbered.length ? numbered[numbered.length-1] : candidates[candidates.length-1]);
+    if(byNumber.length){
+      const hit=byNumber[byNumber.length-1];
       return {
         time:String(hit.time||"").trim(),
         court:formatDoubleOutCourt(hit.court)
@@ -1028,21 +1025,25 @@ function doubleOutMatchMeta(m){
     }
   }
 
-  /*
-    Frauen-Fallback für noch nicht aufgelöste Winner/Loser-Platzhalter:
-    nur ein eindeutig nummeriertes Frauen-Double-Out-Match aus dem
-    veröffentlichten Schedule verwenden.
-  */
-  if(activeDoubleOutGender==="women" && matchRx){
-    const womenNumbered=(dataStore.schedule||[]).filter(s=>{
+  // Nur falls die Matchnummer im Schedule-Text nicht vorhanden ist:
+  // Fallback über die konkrete Team-Paarung.
+  const t1=normalizeScheduleTeam(m.team1);
+  const t2=normalizeScheduleTeam(m.team2);
+
+  if(t1 && t2 && t1!=="tbd" && t2!=="tbd"){
+    const candidates=(dataStore.schedule||[]).filter(s=>{
       const scheduleText=String(s.match||"").trim();
-      return gender(s.gender)==="W"
-        && !/\bPOOL\b/i.test(scheduleText)
-        && matchRx.test(scheduleText);
+      if(/\bPOOL\b/i.test(scheduleText))return false;
+      if(activeDoubleOutGender==="women" && gender(s.gender)!=="W")return false;
+      if(activeDoubleOutGender==="men" && gender(s.gender)!=="M")return false;
+
+      const s1=normalizeScheduleTeam(s.team1);
+      const s2=normalizeScheduleTeam(s.team2);
+      return (s1===t1 && s2===t2) || (s1===t2 && s2===t1);
     });
 
-    if(womenNumbered.length){
-      const hit=womenNumbered[womenNumbered.length-1];
+    if(candidates.length){
+      const hit=candidates[candidates.length-1];
       return {
         time:String(hit.time||"").trim(),
         court:formatDoubleOutCourt(hit.court)
