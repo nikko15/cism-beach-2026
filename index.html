@@ -1003,39 +1003,32 @@ function formatDoubleOutCourt(court){
 }
 
 function doubleOutMatchMeta(m){
-  const matchNo=String(m.match||"").trim();
+  const matchNo=Number(String(m.match||"").trim());
 
-  // Zeit/Court zuerst über die EXAKTE Double-Out-Matchnummer
-  // aus den veröffentlichten Schedule-&-Results-Daten bestimmen.
-  const scheduleMatchNumber = s => {
-    const txt=String(s.match||"").trim();
-    if(/\bPOOL\b/i.test(txt))return "";
-
-    let hit=txt.match(/\bMATCH\s*#?\s*(\d+)\b/i);
-    if(hit)return hit[1];
-
-    hit=txt.match(/^\s*#?\s*(\d+)\s*$/);
-    return hit ? hit[1] : "";
-  };
-
-  if(matchNo){
-    const byNumber=(dataStore.schedule||[]).filter(s=>{
-      if(activeDoubleOutGender==="women" && gender(s.gender)!=="W")return false;
-      if(activeDoubleOutGender==="men" && gender(s.gender)!=="M")return false;
-      return scheduleMatchNumber(s)===matchNo;
-    });
-
-    if(byNumber.length){
-      const hit=byNumber[byNumber.length-1];
-      return {
-        time:String(hit.time||"").trim(),
-        court:formatDoubleOutCourt(hit.court)
-      };
-    }
+  // WOMEN DOUBLE OUT 8:
+  // feste Turnierzeiten/Courts laut finalem Ablauf vom 16.09.2026.
+  // Dadurch gibt es keine fehlerhafte Zuordnung mehr über Schedule-Matchnummern.
+  if(activeDoubleOutGender==="women"){
+    const womenMeta={
+      1:{time:"08:00",court:"C1"},
+      2:{time:"08:00",court:"C2"},
+      3:{time:"08:45",court:"C1"},
+      4:{time:"08:45",court:"C2"},
+      5:{time:"10:15",court:"C1"},
+      6:{time:"10:15",court:"C2"},
+      7:{time:"11:00",court:"C1"},
+      8:{time:"11:00",court:"C2"},
+      9:{time:"13:15",court:"C1"},
+      10:{time:"13:15",court:"C2"},
+      11:{time:"15:30",court:"C1"},
+      12:{time:"15:30",court:"C2"}
+    };
+    if(womenMeta[matchNo]) return womenMeta[matchNo];
   }
 
-  // Nur falls die Matchnummer im Schedule-Text nicht vorhanden ist:
-  // Fallback über die konkrete Team-Paarung.
+  // MEN bleibt unverändert: Zuordnung aus Schedule & Results
+  const matchText=String(m.match||"").trim();
+  const matchRx=matchText ? new RegExp(`(?:MATCH\\s*)?${matchText}(?!\\d)`, "i") : null;
   const t1=normalizeScheduleTeam(m.team1);
   const t2=normalizeScheduleTeam(m.team2);
 
@@ -1043,16 +1036,16 @@ function doubleOutMatchMeta(m){
     const candidates=(dataStore.schedule||[]).filter(s=>{
       const scheduleText=String(s.match||"").trim();
       if(/\bPOOL\b/i.test(scheduleText))return false;
-      if(activeDoubleOutGender==="women" && gender(s.gender)!=="W")return false;
-      if(activeDoubleOutGender==="men" && gender(s.gender)!=="M")return false;
-
       const s1=normalizeScheduleTeam(s.team1);
       const s2=normalizeScheduleTeam(s.team2);
       return (s1===t1 && s2===t2) || (s1===t2 && s2===t1);
     });
 
     if(candidates.length){
-      const hit=candidates[candidates.length-1];
+      const numbered=matchRx
+        ? candidates.filter(s=>matchRx.test(String(s.match||"").trim()))
+        : [];
+      const hit=(numbered.length ? numbered[numbered.length-1] : candidates[candidates.length-1]);
       return {
         time:String(hit.time||"").trim(),
         court:formatDoubleOutCourt(hit.court)
