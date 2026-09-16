@@ -725,13 +725,36 @@ function renderSchedule(){
     without shifting the remaining matches to the wrong day.
   */
   const rows=dataStore.schedule
-    .map((x,index)=>({
-      ...x,
-      _index:index,
-      // v5.6 exports the real schedule date per row. The index fallback
-      // keeps the page compatible with older data.json files.
-      _day:x.date || (index<72?"2026-09-15":index<144?"2026-09-16":"2026-09-17")
-    }))
+    .map((x,index)=>{
+      let row={...x};
+
+      // Sondermatch außerhalb der Master-Excel:
+      // Alarimi-Alhosni vs Liva-Eliza wird auf der Website als
+      // Placement Game 9-11 mit dem Endstand 2-1 geführt.
+      const cleanTeam=v=>String(v||"")
+        .replace(/\s*\[[^\]]+\]\s*$/,"")
+        .replace(/[.\s-]+/g,"")
+        .toLowerCase();
+
+      const t1=cleanTeam(row.team1);
+      const t2=cleanTeam(row.team2);
+      const alarimi=cleanTeam("Alarimi-Alhosni");
+      const liva=cleanTeam("Liva-Eliza");
+
+      if(gender(row.gender)==="W" &&
+         ((t1===alarimi && t2===liva) || (t1===liva && t2===alarimi))){
+        row.match="PLACEMENT GAME 9-11";
+        row.result=(t1===alarimi) ? "2-1" : "1-2";
+      }
+
+      return {
+        ...row,
+        _index:index,
+        // v5.6 exports the real schedule date per row. The index fallback
+        // keeps the page compatible with older data.json files.
+        _day:row.date || (index<72?"2026-09-15":index<144?"2026-09-16":"2026-09-17")
+      };
+    })
     .filter(x=>activeFilter==="ALL"||gender(x.gender)===activeFilter);
 
   if(!rows.length){
