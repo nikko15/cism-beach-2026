@@ -1156,6 +1156,24 @@ function resolveWomenDoubleOutTeam(name){
 function doMatchCard(m){
   let displayMatch=m.match;
 
+  if(activeDoubleOutGender==="women" && Number(String(m.match||"").trim())===11){
+    const source9=(dataStore.womenDoubleOut||[]).find(x=>Number(x.match)===7);
+    const source10=(dataStore.womenDoubleOut||[]).find(x=>Number(x.match)===8);
+
+    const winnerOfSource=source=>{
+      if(!source || !source.played) return "";
+      const r=String(source.result||"").trim();
+      if(!r.includes(":")) return "";
+      const p=r.split(":").map(Number);
+      if(p.length<2 || p.some(Number.isNaN) || p[0]===p[1]) return "";
+      return p[0]>p[1] ? source.team1 : source.team2;
+    };
+
+    const w9=winnerOfSource(source9);
+    const w10=winnerOfSource(source10);
+    m={...m,team1:w9||"Winner of match 9",team2:w10||"Winner of match 10"};
+  }
+
   if(activeDoubleOutGender==="women"){
     // Die Excel-/JSON-Matchnummer bleibt intern unverändert, damit
     // Winner/Loser-Verknüpfungen weiterhin auf das richtige Quellmatch zeigen.
