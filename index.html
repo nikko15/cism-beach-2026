@@ -650,7 +650,6 @@
         <div>
           <div class="do-gender-tabs">
             <button class="do-gender-btn active" data-do-gender="men">Men</button>
-            <button class="do-gender-btn" data-do-gender="women">Women</button>
           </div>
           <div id="menBracketTabs" class="do-subtabs">
             <button class="do-subtab-btn active" data-men-bracket="championship">Places 1–16</button>
@@ -751,10 +750,11 @@ function renderSchedule(){
           row.result=(t1===alarimi) ? "2-1" : "1-2";
         }
 
-        // Match 11: Liva-Eliza – Stienstra-Sijbesma, Ergebnis folgt später.
+        // Match 11: Liva-Eliza – Stienstra-Sijbesma, beendet 0-2.
         if(originalMatch==="DO WOMEN - MATCH 11" &&
            ((t1===liva && t2===stienstra) || (t1===stienstra && t2===liva))){
           row.match="PLACEMENT GAME 9-11";
+          row.result=(t1===liva) ? "0-2" : "2-0";
         }
 
         // Match 15: Alarimi-Alhosni – Stienstra-Sijbesma, Ergebnis folgt später.
@@ -1255,74 +1255,6 @@ function renderDoubleOut(){
   let bracketSubtitle="";
   const board=document.getElementById("doubleOutBoard");
 
-  if(activeDoubleOutGender==="women"){
-    all=dataStore.womenDoubleOut;
-    bracketTitle="Women · Double Out 8";
-    bracketSubtitle="8-team double-out bracket after the women’s pool phase";
-
-    if(!Array.isArray(all)||!all.length){
-      board.innerHTML='<div class="empty-state">Bracket data is not available yet.</div>';
-      return;
-    }
-
-    const wOpen=matchesByNums(all,[1,2,3,4]);
-    const wRound2=matchesByNums(all,[9,10]);
-    const wQual=matchesByNums(all,[12]);
-    const lRound1=matchesByNums(all,[5,6]);
-    const lRound2=matchesByNums(all,[7,8]).map(m=>{
-      const n=Number(m.match);
-      // Visible Match 9 = internal Match 7
-      if(n===7) return {...m,team1:"Winner of match 5",team2:"Smilgaite-Curukova"};
-      // Visible Match 10 = internal Match 8
-      if(n===8) return {...m,team1:"Valtere-Golovac",team2:"Chevalin-Schermann"};
-      return m;
-    });
-    const lRound3=matchesByNums(all,[11]);
-    const lQual=matchesByNums(all,[13]);
-    const bronze=matchesByNums(all,[29]);
-    const final=matchesByNums(all,[30]);
-
-    board.innerHTML=`
-      <div class="do-lane">
-        <div class="do-lane-title">${esc(bracketTitle)} · Winners Bracket</div>
-        <div class="do-help" style="margin:0 0 12px 0">${esc(bracketSubtitle)}</div>
-        <div class="do-flow">
-          ${doRound("Opening Round",wOpen)}
-          <div class="do-arrow">›</div>
-          ${doRound("Winners Round 2",wRound2)}
-          <div class="do-arrow">›</div>
-          ${doRound("Qualification",wQual)}
-        </div>
-      </div>
-
-      <div class="do-lane">
-        <div class="do-lane-title">Losers Bracket</div>
-        <div class="do-flow">
-          ${doRound("Losers Round 1",lRound1)}
-          <div class="do-arrow">›</div>
-          ${doRound("Losers Round 2",lRound2)}
-          <div class="do-arrow">›</div>
-          ${doRound("Losers Round 3",lRound3)}
-          <div class="do-arrow">›</div>
-          ${doRound("Qualification",lQual)}
-        </div>
-      </div>
-
-      <div class="do-lane">
-        <div class="do-lane-title">Medal Matches</div>
-        <div class="do-medals">
-          <div class="do-medal-card">
-            <div class="do-medal-label">🥉 Bronze Medal Match · Match 29</div>
-            ${bronze.map(doMatchCard).join("")}
-          </div>
-          <div class="do-medal-card final">
-            <div class="do-medal-label">🏆 Final · Match 30</div>
-            ${final.map(doMatchCard).join("")}
-          </div>
-        </div>
-      </div>`;
-    return;
-  }
 
   if(activeMenBracket==="placement"){
     all=dataStore.menPlacementDoubleOut;
@@ -1450,7 +1382,7 @@ function renderPlayerSearch(){
   const womenMain=(dataStore.womenMainDraw||[]).filter(m=>searchHit(q,m.team1,m.team2));
   const menDO=[...(dataStore.menDoubleOut||[]),...(dataStore.menPlacementDoubleOut||[])]
     .filter(m=>searchHit(q,m.team1,m.team2));
-  const womenDO=(dataStore.womenDoubleOut||[]).filter(m=>searchHit(q,m.team1,m.team2));
+  const womenDO=[];
 
   const poolTeams=[];
   [...(dataStore.menPools||[]),...(dataStore.womenPools||[])].forEach(pool=>{
