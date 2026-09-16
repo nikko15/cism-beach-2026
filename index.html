@@ -1050,6 +1050,32 @@ function formatDoubleOutCourt(court){
   return c;
 }
 
+function doubleOutCourtFromSchedule(m){
+  const matchText=String(m.match||"").trim();
+  const matchRx=matchText ? new RegExp(`(?:MATCH\\s*)?${matchText}(?!\\d)`, "i") : null;
+  const t1=normalizeScheduleTeam(m.team1);
+  const t2=normalizeScheduleTeam(m.team2);
+
+  if(t1 && t2 && t1!=="tbd" && t2!=="tbd"){
+    const candidates=(dataStore.schedule||[]).filter(s=>{
+      const scheduleText=String(s.match||"").trim();
+      if(/\\bPOOL\\b/i.test(scheduleText)) return false;
+      const s1=normalizeScheduleTeam(s.team1);
+      const s2=normalizeScheduleTeam(s.team2);
+      return (s1===t1 && s2===t2) || (s1===t2 && s2===t1);
+    });
+
+    if(candidates.length){
+      const numbered=matchRx
+        ? candidates.filter(s=>matchRx.test(String(s.match||"").trim()))
+        : [];
+      const hit=(numbered.length ? numbered[numbered.length-1] : candidates[candidates.length-1]);
+      return formatDoubleOutCourt(hit.court);
+    }
+  }
+  return "";
+}
+
 function doubleOutMatchMeta(m){
   const matchNo=Number(String(m.match||"").trim());
 
@@ -1084,22 +1110,22 @@ function doubleOutMatchMeta(m){
 
   // MEN Places 17–32 hat einen eigenen Zeitplan.
   if(activeDoubleOutGender==="men" && activeMenBracket==="placement"){
-    if([13,14,15,16].includes(matchNo)) return {time:"2.00 pm",court:""};
-    if([17,18,19,20].includes(matchNo)) return {time:"3.30 pm",court:""};
-    if([21,22,23,24].includes(matchNo)) return {time:"5.00 pm",court:""};
+    if([13,14,15,16].includes(matchNo)) return {time:"2.00 pm",court:doubleOutCourtFromSchedule(m)};
+    if([17,18,19,20].includes(matchNo)) return {time:"3.30 pm",court:doubleOutCourtFromSchedule(m)};
+    if([21,22,23,24].includes(matchNo)) return {time:"5.00 pm",court:doubleOutCourtFromSchedule(m)};
   }
 
   // MEN Championship Bracket · Places 1–16
   if(activeDoubleOutGender==="men" && activeMenBracket!=="placement" && [13,14,15,16].includes(matchNo)){
-    return {time:"1.15 pm",court:""};
+    return {time:"1.15 pm",court:doubleOutCourtFromSchedule(m)};
   }
 
   if(activeDoubleOutGender==="men" && activeMenBracket!=="placement" && [17,18,19,20].includes(matchNo)){
-    return {time:"2.45 pm",court:""};
+    return {time:"2.45 pm",court:doubleOutCourtFromSchedule(m)};
   }
 
   if(activeDoubleOutGender==="men" && activeMenBracket!=="placement" && [21,22,23,24].includes(matchNo)){
-    return {time:"4.15 pm",court:""};
+    return {time:"4.15 pm",court:doubleOutCourtFromSchedule(m)};
   }
 
   // Alle übrigen MEN-Matches: Zuordnung aus Schedule & Results
