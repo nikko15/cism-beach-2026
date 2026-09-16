@@ -1085,19 +1085,6 @@ function doubleOutMatchMeta(m){
 }
 
 function doMatchCard(m){
-  if(activeDoubleOutGender==="women"){
-    const n=Number(String(m.match||"").trim());
-    const progression={
-      7:["Winner of match 1","Winner of match 2"],
-      8:["Winner of match 3","Winner of match 4"],
-      9:["Winner of match 6","Loser of match 8"],
-      10:["Winner of match 5","Loser of match 7"]
-    };
-    if(progression[n]){
-      m={...m,team1:progression[n][0],team2:progression[n][1]};
-    }
-  }
-
   const result=String(m.result||"").trim();
   const matchMeta=doubleOutMatchMeta(m);
   const matchTime=matchMeta.time;
@@ -1172,10 +1159,10 @@ function renderDoubleOut(){
     }
 
     const wOpen=matchesByNums(all,[1,2,3,4]);
-    const wRound2=matchesByNums(all,[7,8]);
+    const wRound2=matchesByNums(all,[9,10]);
     const wQual=matchesByNums(all,[12]);
     const lRound1=matchesByNums(all,[5,6]);
-    const lRound2=matchesByNums(all,[9,10]);
+    const lRound2=matchesByNums(all,[7,8]);
     const lRound3=matchesByNums(all,[11]);
     const lQual=matchesByNums(all,[13]);
     const bronze=matchesByNums(all,[29]);
