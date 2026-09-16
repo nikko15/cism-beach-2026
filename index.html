@@ -840,12 +840,22 @@ function renderSchedule(){
         }
       }
 
-      // Thursday MEN semifinal Match 27: keep the valid game at 11.00 am.
+      // Thursday MEN semifinal Match 27: canonical public schedule entry.
+      // This also repairs the malformed duplicate source row (time 0 / CENTER COURT).
       if((row.date || (index<72?"2026-09-15":index<144?"2026-09-16":"2026-09-17"))==="2026-09-17" &&
          gender(row.gender)==="M" &&
-         String(row.match||"").trim().toUpperCase()==="1/2 FINAL MEN - MATCH 27" &&
-         String(row.court||"").trim().toUpperCase()!=="CENTER COURT"){
+         String(row.match||"").trim().toUpperCase()==="1/2 FINAL MEN - MATCH 27"){
         row.time="11.00 am";
+        row.court="CENTER 1";
+        row.team1="Winner of match 21";
+        row.team2="Winner of match 25";
+        row.result="";
+      }
+
+      // Public label correction for the WOMEN final.
+      if(gender(row.gender)==="W" &&
+         String(row.match||"").trim().toUpperCase()==="1. PLACE WOMEN - MATCH 30"){
+        row.match="FINAL WOMEN - MATCH 30";
       }
 
       // MEN 1/4 FINAL - MATCH 25 has not been played yet.
@@ -862,19 +872,23 @@ function renderSchedule(){
         _day:row.date || (index<72?"2026-09-15":index<144?"2026-09-16":"2026-09-17")
       };
     })
-    .filter(x=>{
-      // Thursday duplicate: keep the real Match 27 at 11.00 / CENTER 1,
-      // suppress only the erroneous duplicate at time 0 / CENTER COURT.
-      const isDuplicateThursdayMatch27 =
-        x._day==="2026-09-17" &&
-        gender(x.gender)==="M" &&
-        String(x.match||"").trim().toUpperCase()==="1/2 FINAL MEN - MATCH 27" &&
-        String(x.time||"").trim()==="0" &&
-        String(x.court||"").trim().toUpperCase()==="CENTER COURT";
+    .filter((()=>{
+      let thursdayMatch27Seen=false;
+      return x=>{
+        if(!(activeFilter==="ALL"||gender(x.gender)===activeFilter)) return false;
 
-      if(isDuplicateThursdayMatch27) return false;
-      return activeFilter==="ALL"||gender(x.gender)===activeFilter;
-    });
+        const isThursdayMatch27 =
+          x._day==="2026-09-17" &&
+          gender(x.gender)==="M" &&
+          String(x.match||"").trim().toUpperCase()==="1/2 FINAL MEN - MATCH 27";
+
+        if(isThursdayMatch27){
+          if(thursdayMatch27Seen) return false;
+          thursdayMatch27Seen=true;
+        }
+        return true;
+      };
+    })());
 
   if(!rows.length){
     box.innerHTML='<div class="empty-state">No matches available.</div>';
