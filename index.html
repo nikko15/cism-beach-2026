@@ -762,6 +762,7 @@ function renderSchedule(){
         if(originalMatch==="DO WOMEN - MATCH 15" &&
            ((t1===alarimi && t2===stienstra) || (t1===stienstra && t2===alarimi))){
           row.match="PLACEMENT GAME 9-11";
+  row.result=(t1===alarimi) ? "0-2" : "2-0";
         }
 
         // Nation für Liva-Eliza ergänzen, falls sie im Schedule fehlt.
