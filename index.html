@@ -1026,7 +1026,26 @@ function doubleOutMatchMeta(m){
     if(womenMeta[matchNo]) return womenMeta[matchNo];
   }
 
-  // MEN bleibt unverändert: Zuordnung aus Schedule & Results
+  // MEN DOUBLE OUT 16:
+  // Matches 9–12 im Winners Bracket starten alle um 11.00 am.
+  if(activeDoubleOutGender==="men" && [9,10,11,12].includes(matchNo)){
+    const menCourts={9:"C1",10:"C2",11:"C1",12:"C2"};
+    return {time:"11.00 am",court:menCourts[matchNo]||""};
+  }
+
+  if(activeDoubleOutGender==="men" && [13,14,15,16].includes(matchNo)){
+    return {time:"1.15 pm",court:""};
+  }
+
+  if(activeDoubleOutGender==="men" && [17,18,19,20].includes(matchNo)){
+    return {time:"2.45 pm",court:""};
+  }
+
+  if(activeDoubleOutGender==="men" && [21,22,23,24].includes(matchNo)){
+    return {time:"4.15 pm",court:""};
+  }
+
+  // Alle übrigen MEN-Matches: Zuordnung aus Schedule & Results
   const matchText=String(m.match||"").trim();
   const matchRx=matchText ? new RegExp(`(?:MATCH\\s*)?${matchText}(?!\\d)`, "i") : null;
   const t1=normalizeScheduleTeam(m.team1);
