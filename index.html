@@ -819,6 +819,12 @@ function renderSchedule(){
         }
       }
 
+      // MEN 1/4 FINAL - MATCH 25 has not been played yet.
+      if(gender(row.gender)==="M" &&
+         String(row.match||"").trim().toUpperCase()==="1/4 FINAL MEN - MATCH 25"){
+        row.result="";
+      }
+
       return {
         ...row,
         _index:index,
