@@ -650,7 +650,6 @@
         <div>
           <div class="do-gender-tabs">
             <button class="do-gender-btn active" data-do-gender="men">Men</button>
-            <button class="do-gender-btn" data-do-gender="women">Women</button>
           </div>
           <div id="menBracketTabs" class="do-subtabs">
             <button class="do-subtab-btn active" data-men-bracket="championship">Places 1–16</button>
@@ -1267,65 +1266,6 @@ function renderDoubleOut(){
   let bracketSubtitle="";
   const board=document.getElementById("doubleOutBoard");
 
-
-  if(activeDoubleOutGender==="women"){
-    all=dataStore.womenDoubleOut;
-    bracketTitle="Women · Double Out 8";
-    bracketSubtitle="Rebuilt bracket from the current Excel tournament plan";
-
-    if(!Array.isArray(all)||!all.length){
-      board.innerHTML='<div class="empty-state">Bracket data is not available yet.</div>';
-      return;
-    }
-
-    const opening=matchesByNums(all,[1,2,3,4]);
-    const lower1=matchesByNums(all,[5,6]);
-    const upper2=matchesByNums(all,[7,8]);
-    const lower2=matchesByNums(all,[9,10]);
-    const match11=matchesByNums(all,[11]);
-    const semis=matchesByNums(all,[12,13]);
-    const bronze=matchesByNums(all,[29]);
-    const final=matchesByNums(all,[30]);
-
-    board.innerHTML=`
-      <div class="do-lane">
-        <div class="do-lane-title">${esc(bracketTitle)}</div>
-        <div class="do-help" style="margin:0 0 12px 0">${esc(bracketSubtitle)}</div>
-        <div class="do-flow">
-          ${doRound("Round 1",opening)}
-          <div class="do-arrow">›</div>
-          ${doRound("Losers Round 1",lower1)}
-          <div class="do-arrow">›</div>
-          ${doRound("Winners Round 2",upper2)}
-          <div class="do-arrow">›</div>
-          ${doRound("Losers Round 2",lower2)}
-          <div class="do-arrow">›</div>
-          ${doRound("Match 11",match11)}
-        </div>
-      </div>
-
-      <div class="do-lane">
-        <div class="do-lane-title">Final Four</div>
-        <div class="do-flow">
-          ${doRound("Semifinals",semis)}
-        </div>
-      </div>
-
-      <div class="do-lane">
-        <div class="do-lane-title">Medal Matches</div>
-        <div class="do-medals">
-          <div class="do-medal-card">
-            <div class="do-medal-label">🥉 Bronze Medal Match · Match 14</div>
-            ${bronze.map(doMatchCard).join("")}
-          </div>
-          <div class="do-medal-card final">
-            <div class="do-medal-label">🏆 Final · Match 15</div>
-            ${final.map(doMatchCard).join("")}
-          </div>
-        </div>
-      </div>`;
-    return;
-  }
 
   if(activeMenBracket==="placement"){
     all=dataStore.menPlacementDoubleOut;
