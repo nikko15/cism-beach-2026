@@ -62,6 +62,21 @@
     .seed-row{border-top:1px solid var(--line);font-size:.88rem}
     .seed-rank{font-weight:900;color:var(--navy)}
     .seed-section-break{background:#f7f9fc;color:#40516a;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-top:1px solid var(--line)}
+    .final-standings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .final-standing-table{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+    .final-standing-title{background:var(--primary);color:#fff;padding:12px 15px;font-weight:800;font-size:1.05rem}
+    .final-standing-head,.final-standing-row{display:grid;grid-template-columns:58px minmax(170px,1.6fr) minmax(150px,1fr) minmax(150px,1fr) 82px;align-items:center}
+    .final-standing-head{background:#eef2f7;color:#526177;font-size:.73rem;font-weight:800;text-transform:uppercase}
+    .final-standing-head>div,.final-standing-row>div{padding:9px 10px}
+    .final-standing-row{border-top:1px solid var(--line);font-size:.88rem}
+    .final-place{font-weight:900;text-align:center;color:var(--navy)}
+    .final-player{color:#40516a}
+    @media(max-width:900px){
+      .final-standings-grid{grid-template-columns:1fr}
+      .final-standing-head,.final-standing-row{grid-template-columns:48px minmax(155px,1.5fr) 70px}
+      .final-standing-head>div:nth-child(3),.final-standing-head>div:nth-child(4),
+      .final-standing-row>div:nth-child(3),.final-standing-row>div:nth-child(4){display:none}
+    }
     .standing-row{border-top:1px solid var(--line);font-size:.9rem}
     .standing-row:first-of-type{border-top:none}
     .rank{font-weight:900;text-align:center}
@@ -523,6 +538,7 @@
       <a class="card action" href="#women-standings"><div class="icon">🏐</div><div><h3>Women</h3><p>All pool standings and statistics.</p></div></a>
       <a class="card action" href="#men-main-draw"><div class="icon">🏆</div><div><h3>Main Draw Men</h3><p>Matches, sets and results.</p></div></a>
       <a class="card action" href="#women-main-draw"><div class="icon">🏆</div><div><h3>Main Draw Women</h3><p>Matches, sets and results.</p></div></a>
+      <a class="card action" href="#final-standings"><div class="icon">🥇</div><div><h3>Final Standings</h3><p>Final ranking for Men & Women.</p></div></a>
       <a class="card action" id="doubleOutQuickLink" href="#double-out" hidden><div class="icon">🥇</div><div><h3>Double Out</h3><p>Interactive tournament bracket.</p></div></a>
     </div>
   </section>
@@ -639,6 +655,14 @@
     </div>
   </section>
 
+  <section id="final-standings" class="section">
+    <h2 class="division-title">Final Standings</h2>
+    <div class="final-standings-grid">
+      <div id="menFinalStandings"><div class="loading">Loading final standings…</div></div>
+      <div id="womenFinalStandings"><div class="loading">Loading final standings…</div></div>
+    </div>
+  </section>
+
   <section id="double-out" class="section" hidden>
     <h2 class="division-title">Double Out · Tournament Bracket</h2>
     <div class="do-shell">
@@ -668,7 +692,7 @@
 </main>
 
 <script>
-let dataStore={schedule:[],menPools:[],womenPools:[],poolPlayComplete:false,menSeeds:[],womenSeeds:[],menMainDraw:[],womenMainDraw:[],doubleOutPublished:false,menDoubleOut:[],menPlacementDoubleOut:[],womenDoubleOut:[]};
+let dataStore={schedule:[],menPools:[],womenPools:[],poolPlayComplete:false,menSeeds:[],womenSeeds:[],menMainDraw:[],womenMainDraw:[],menFinalStandings:[],womenFinalStandings:[],doubleOutPublished:false,menDoubleOut:[],menPlacementDoubleOut:[],womenDoubleOut:[]};
 let activeDoubleOutGender="men";
 let activeMenBracket="championship";
 let activeFilter="ALL";
@@ -1246,6 +1270,37 @@ function matchesByNums(all,nums){
   return all.filter(m=>set.has(Number(m.match))).sort((a,b)=>Number(a.match)-Number(b.match));
 }
 
+
+function renderFinalStandings(targetId,title,rows){
+  const box=document.getElementById(targetId);
+  if(!box)return;
+
+  if(!Array.isArray(rows)||!rows.length){
+    box.innerHTML=`
+      <div class="final-standing-table">
+        <div class="final-standing-title">${esc(title)}</div>
+        <div class="empty-state">Final standings are not available yet.</div>
+      </div>`;
+    return;
+  }
+
+  box.innerHTML=`
+    <div class="final-standing-table">
+      <div class="final-standing-title">${esc(title)}</div>
+      <div class="final-standing-head">
+        <div>#</div><div>Team</div><div>Player 1</div><div>Player 2</div><div>Nation</div>
+      </div>
+      ${rows.map(r=>`
+        <div class="final-standing-row">
+          <div class="final-place">${esc(r.place)}</div>
+          <div class="team-name">${esc(r.team)}</div>
+          <div class="final-player">${esc(r.player1)}</div>
+          <div class="final-player">${esc(r.player2)}</div>
+          <div class="country">${esc(r.country)}</div>
+        </div>`).join("")}
+    </div>`;
+}
+
 function renderDoubleOut(){
   const section=document.getElementById("double-out");
   const quick=document.getElementById("doubleOutQuickLink");
@@ -1475,6 +1530,8 @@ async function loadData(){
     dataStore.womenSeeds=Array.isArray(dataStore.womenSeeds)?dataStore.womenSeeds:[];
     dataStore.menMainDraw=Array.isArray(dataStore.menMainDraw)?dataStore.menMainDraw:[];
     dataStore.womenMainDraw=Array.isArray(dataStore.womenMainDraw)?dataStore.womenMainDraw:[];
+    dataStore.menFinalStandings=Array.isArray(dataStore.menFinalStandings)?dataStore.menFinalStandings:[];
+    dataStore.womenFinalStandings=Array.isArray(dataStore.womenFinalStandings)?dataStore.womenFinalStandings:[];
     dataStore.menDoubleOut=Array.isArray(dataStore.menDoubleOut)?dataStore.menDoubleOut:[];
     dataStore.menPlacementDoubleOut=Array.isArray(dataStore.menPlacementDoubleOut)?dataStore.menPlacementDoubleOut:[];
     dataStore.womenDoubleOut=Array.isArray(dataStore.womenDoubleOut)?dataStore.womenDoubleOut:[];
@@ -1500,6 +1557,9 @@ async function loadData(){
     // WOMEN: use the standard 3 x 4-team Main Draw (Pools I, J and K).
     renderMainDraw("womenMainDraw",dataStore.womenMainDraw);
 
+    renderFinalStandings("menFinalStandings","Men",dataStore.menFinalStandings);
+    renderFinalStandings("womenFinalStandings","Women",dataStore.womenFinalStandings);
+
     renderDoubleOut();
     renderPlayerSearch();
   }catch(e){
@@ -1509,6 +1569,8 @@ async function loadData(){
     document.getElementById("womenPools").innerHTML='<div class="card error-state">Standings unavailable.</div>';
     document.getElementById("menMainDraw").innerHTML='<div class="card error-state">Main draw unavailable.</div>';
     document.getElementById("womenMainDraw").innerHTML='<div class="card error-state">Main draw unavailable.</div>';
+    document.getElementById("menFinalStandings").innerHTML='<div class="card error-state">Final standings unavailable.</div>';
+    document.getElementById("womenFinalStandings").innerHTML='<div class="card error-state">Final standings unavailable.</div>';
     console.error(e);
   }
 }
