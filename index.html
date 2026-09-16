@@ -1182,10 +1182,14 @@ function doMatchCard(m){
     const sourceMatchNo=Number(String(m.match||"").trim());
     displayMatch=womenDisplayMatch[sourceMatchNo] || m.match;
 
-    m={...m,
-      team1:resolveWomenDoubleOutTeam(m.team1),
-      team2:resolveWomenDoubleOutTeam(m.team2)
-    };
+    // Match 11 refers to the NEW visible Match 9 and Match 10.
+    // Therefore its placeholders must not be resolved using the old internal numbers.
+    if(sourceMatchNo!==11){
+      m={...m,
+        team1:resolveWomenDoubleOutTeam(m.team1),
+        team2:resolveWomenDoubleOutTeam(m.team2)
+      };
+    }
   }
 
   const result=String(m.result||"").trim();
