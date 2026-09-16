@@ -840,6 +840,14 @@ function renderSchedule(){
         }
       }
 
+      // Thursday MEN semifinal Match 27: keep the valid game at 11.00 am.
+      if((row.date || (index<72?"2026-09-15":index<144?"2026-09-16":"2026-09-17"))==="2026-09-17" &&
+         gender(row.gender)==="M" &&
+         String(row.match||"").trim().toUpperCase()==="1/2 FINAL MEN - MATCH 27" &&
+         String(row.court||"").trim().toUpperCase()!=="CENTER COURT"){
+        row.time="11.00 am";
+      }
+
       // MEN 1/4 FINAL - MATCH 25 has not been played yet.
       if(gender(row.gender)==="M" &&
          String(row.match||"").trim().toUpperCase()==="1/4 FINAL MEN - MATCH 25"){
