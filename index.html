@@ -1084,7 +1084,35 @@ function doubleOutMatchMeta(m){
   return {time:"",court:""};
 }
 
+function resolveWomenDoubleOutTeam(name){
+  const raw=String(name||"").trim();
+  if(activeDoubleOutGender!=="women") return raw;
+
+  const hit=raw.match(/^(Winner|Loser) of match\s*(\d+)$/i);
+  if(!hit) return raw;
+
+  const source=(dataStore.womenDoubleOut||[]).find(x=>Number(x.match)===Number(hit[2]));
+  if(!source || !source.played) return raw;
+
+  const result=String(source.result||"").trim();
+  if(!result.includes(":")) return raw;
+
+  const parts=result.split(":").map(Number);
+  if(parts.length<2 || parts.some(Number.isNaN) || parts[0]===parts[1]) return raw;
+
+  const winner=parts[0]>parts[1] ? source.team1 : source.team2;
+  const loser=parts[0]>parts[1] ? source.team2 : source.team1;
+  return hit[1].toLowerCase()==="winner" ? winner : loser;
+}
+
 function doMatchCard(m){
+  if(activeDoubleOutGender==="women"){
+    m={...m,
+      team1:resolveWomenDoubleOutTeam(m.team1),
+      team2:resolveWomenDoubleOutTeam(m.team2)
+    };
+  }
+
   const result=String(m.result||"").trim();
   const matchMeta=doubleOutMatchMeta(m);
   const matchTime=matchMeta.time;
