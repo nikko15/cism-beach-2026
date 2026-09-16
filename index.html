@@ -819,6 +819,24 @@ function renderSchedule(){
         }
       }
 
+      // Thursday only: display the revised schedule one hour earlier.
+      if((row.date || (index<72?"2026-09-15":index<144?"2026-09-16":"2026-09-17"))==="2026-09-17"){
+        const thursdayTimes={
+          "9.00 am":"8.00 am",
+          "10.00 am":"09.00 am",
+          "11.00 am":"10.00 am",
+          "12.00 am":"11.00 am",
+          "1.00 pm":"12.00 am",
+          "2.00 pm":"1.00 pm",
+          "3.00 pm":"2.00 pm",
+          "4.00 om":"3.00 pm",
+          "4.00 pm":"3.00 pm",
+          "5.00 pm":"4.00 pm"
+        };
+        const originalTime=String(row.time||"").trim().toLowerCase();
+        if(thursdayTimes[originalTime]) row.time=thursdayTimes[originalTime];
+      }
+
       // MEN 1/4 FINAL - MATCH 25 has not been played yet.
       if(gender(row.gender)==="M" &&
          String(row.match||"").trim().toUpperCase()==="1/4 FINAL MEN - MATCH 25"){
