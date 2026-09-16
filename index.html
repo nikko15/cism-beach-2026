@@ -1106,7 +1106,16 @@ function resolveWomenDoubleOutTeam(name){
 }
 
 function doMatchCard(m){
+  let displayMatch=m.match;
+
   if(activeDoubleOutGender==="women"){
+    // Die Excel-/JSON-Matchnummer bleibt intern unverändert, damit
+    // Winner/Loser-Verknüpfungen weiterhin auf das richtige Quellmatch zeigen.
+    // Nur die auf der Website sichtbare Nummer wird für den korrigierten Baum getauscht.
+    const womenDisplayMatch={7:9,8:10,9:7,10:8};
+    const sourceMatchNo=Number(String(m.match||"").trim());
+    displayMatch=womenDisplayMatch[sourceMatchNo] || m.match;
+
     m={...m,
       team1:resolveWomenDoubleOutTeam(m.team1),
       team2:resolveWomenDoubleOutTeam(m.team2)
@@ -1136,7 +1145,7 @@ function doMatchCard(m){
 
   return `<article class="do-match">
     <div class="do-match-top">
-      <span>Match ${esc(m.match)}${matchTime?` · ${esc(matchTime)}`:""}${matchCourt?` · ${esc(matchCourt)}`:""}</span>
+      <span>Match ${esc(displayMatch)}${matchTime?` · ${esc(matchTime)}`:""}${matchCourt?` · ${esc(matchCourt)}`:""}</span>
       <span><i class="do-status ${m.played?"live":""}"></i>${m.played?"RESULT":"UPCOMING"}</span>
     </div>
     ${teamRow(m.team1,sets1,w1,winner1)}
