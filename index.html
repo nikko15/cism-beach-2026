@@ -728,9 +728,9 @@ function renderSchedule(){
     .map((x,index)=>{
       let row={...x};
 
-      // Sondermatch außerhalb der Master-Excel:
-      // Alarimi-Alhosni vs Liva-Eliza wird auf der Website als
-      // Placement Game 9-11 mit dem Endstand 2-1 geführt.
+      // Sondermatches außerhalb der Master-Excel:
+      // Diese drei Spiele werden ausschließlich auf der Website als
+      // PLACEMENT GAME 9-11 geführt.
       const cleanTeam=v=>String(v||"")
         .replace(/\s*\[[^\]]+\]\s*$/,"")
         .replace(/[.\s-]+/g,"")
@@ -740,11 +740,36 @@ function renderSchedule(){
       const t2=cleanTeam(row.team2);
       const alarimi=cleanTeam("Alarimi-Alhosni");
       const liva=cleanTeam("Liva-Eliza");
+      const stienstra=cleanTeam("Stienstra-Sijbesma");
+      const originalMatch=String(row.match||"").trim().toUpperCase();
 
-      if(gender(row.gender)==="W" &&
-         ((t1===alarimi && t2===liva) || (t1===liva && t2===alarimi))){
-        row.match="PLACEMENT GAME 9-11";
-        row.result=(t1===alarimi) ? "2-1" : "1-2";
+      if(gender(row.gender)==="W"){
+        // Match 5: Alarimi-Alhosni – Liva-Eliza, bereits 2-1 beendet.
+        if(originalMatch==="DO WOMEN - MATCH 5" &&
+           ((t1===alarimi && t2===liva) || (t1===liva && t2===alarimi))){
+          row.match="PLACEMENT GAME 9-11";
+          row.result=(t1===alarimi) ? "2-1" : "1-2";
+        }
+
+        // Match 11: Liva-Eliza – Stienstra-Sijbesma, Ergebnis folgt später.
+        if(originalMatch==="DO WOMEN - MATCH 11" &&
+           ((t1===liva && t2===stienstra) || (t1===stienstra && t2===liva))){
+          row.match="PLACEMENT GAME 9-11";
+        }
+
+        // Match 15: Alarimi-Alhosni – Stienstra-Sijbesma, Ergebnis folgt später.
+        if(originalMatch==="DO WOMEN - MATCH 15" &&
+           ((t1===alarimi && t2===stienstra) || (t1===stienstra && t2===alarimi))){
+          row.match="PLACEMENT GAME 9-11";
+        }
+
+        // Nation für Liva-Eliza ergänzen, falls sie im Schedule fehlt.
+        if(t1===liva && !/\[LAT\]\s*$/i.test(String(row.team1||""))){
+          row.team1=String(row.team1||"").replace(/\s*\[[^\]]+\]\s*$/,"").replace("Liva.-Eliza","Liva-Eliza").trim()+" [LAT]";
+        }
+        if(t2===liva && !/\[LAT\]\s*$/i.test(String(row.team2||""))){
+          row.team2=String(row.team2||"").replace(/\s*\[[^\]]+\]\s*$/,"").replace("Liva.-Eliza","Liva-Eliza").trim()+" [LAT]";
+        }
       }
 
       return {
