@@ -1247,7 +1247,12 @@ function renderDoubleOut(){
     const wRound2=matchesByNums(all,[9,10]);
     const wQual=matchesByNums(all,[12]);
     const lRound1=matchesByNums(all,[5,6]);
-    const lRound2=matchesByNums(all,[7,8]);
+    const lRound2=matchesByNums(all,[7,8]).map(m=>{
+      const n=Number(m.match);
+      if(n===7) return {...m,team1:"Winner of match 5",team2:"Loser of match 8"};
+      if(n===8) return {...m,team1:"Winner of match 6",team2:"Loser of match 7"};
+      return m;
+    });
     const lRound3=matchesByNums(all,[11]);
     const lQual=matchesByNums(all,[13]);
     const bronze=matchesByNums(all,[29]);
