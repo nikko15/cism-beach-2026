@@ -805,7 +805,19 @@ function renderSchedule(){
         _day:row.date || (index<72?"2026-09-15":index<144?"2026-09-16":"2026-09-17")
       };
     })
-    .filter(x=>activeFilter==="ALL"||gender(x.gender)===activeFilter);
+    .filter(x=>{
+      // Thursday duplicate: keep the real Match 27 at 11.00 / CENTER 1,
+      // suppress only the erroneous duplicate at time 0 / CENTER COURT.
+      const isDuplicateThursdayMatch27 =
+        x._day==="2026-09-17" &&
+        gender(x.gender)==="M" &&
+        String(x.match||"").trim().toUpperCase()==="1/2 FINAL MEN - MATCH 27" &&
+        String(x.time||"").trim()==="0" &&
+        String(x.court||"").trim().toUpperCase()==="CENTER COURT";
+
+      if(isDuplicateThursdayMatch27) return false;
+      return activeFilter==="ALL"||gender(x.gender)===activeFilter;
+    });
 
   if(!rows.length){
     box.innerHTML='<div class="empty-state">No matches available.</div>';
