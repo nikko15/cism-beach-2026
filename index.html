@@ -674,7 +674,16 @@ let activeDoubleOutGender="men";
 let activeMenBracket="championship";
 let activeFilter="ALL";
 let collapsedScheduleDays=new Set(["2026-09-15"]);
-let collapsedContentSections=new Set();
+let collapsedContentSections=new Set(["men-standings","men-seeds","women-standings","women-seeds","men-main-draw","women-main-draw"]);
+document.addEventListener("DOMContentLoaded",()=>{
+  collapsedContentSections.forEach(sectionId=>{
+    const shell=document.querySelector(`[data-collapsible-section="${sectionId}"]`);
+    if(!shell)return;
+    shell.classList.add("collapsed");
+    const btn=shell.querySelector(".content-section-toggle");
+    if(btn)btn.setAttribute("aria-expanded","false");
+  });
+});
 
 function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
 function gender(v){v=String(v??"").trim().toUpperCase();if(v.startsWith("M"))return"M";if(v.startsWith("W")||v.startsWith("F"))return"W";return v}
