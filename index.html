@@ -650,6 +650,7 @@
         <div>
           <div class="do-gender-tabs">
             <button class="do-gender-btn active" data-do-gender="men">Men</button>
+            <button class="do-gender-btn" data-do-gender="women">Women</button>
           </div>
           <div id="menBracketTabs" class="do-subtabs">
             <button class="do-subtab-btn active" data-men-bracket="championship">Places 1–16</button>
@@ -1076,28 +1077,42 @@ function doubleOutCourtFromSchedule(m){
   return "";
 }
 
+function womenDoubleOutScheduleMeta(m){
+  const sourceNo=Number(String(m.match||"").trim());
+  const visibleNo=sourceNo===29 ? 14 : sourceNo===30 ? 15 : sourceNo;
+
+  const patterns = visibleNo===12
+    ? [/1\/2 FINAL WOMEN\s*-\s*MATCH\s*12/i]
+    : visibleNo===13
+    ? [/1\/2 FINAL WOMEN\s*-\s*MATCH\s*13/i]
+    : visibleNo===14
+    ? [/3\.\s*PLACE WOMEN\s*-\s*MATCH\s*14/i]
+    : visibleNo===15
+    ? [/1\.\s*PLACE WOMEN\s*-\s*MATCH\s*15/i]
+    : [new RegExp(`DO WOMEN\\s*-\\s*MATCH\\s*${visibleNo}(?!\\d)`,"i")];
+
+  const hit=(dataStore.schedule||[]).find(s=>{
+    const label=String(s.match||"").trim();
+    return patterns.some(rx=>rx.test(label));
+  });
+
+  if(hit){
+    return {
+      time:String(hit.time||"").trim().toLowerCase(),
+      court:formatDoubleOutCourt(hit.court)
+    };
+  }
+
+  // Match 11 is stored in the rebuilt WOMEN Double Out sheet itself.
+  if(visibleNo===11) return {time:"10.00 am",court:"C2"};
+  return {time:"",court:""};
+}
+
 function doubleOutMatchMeta(m){
   const matchNo=Number(String(m.match||"").trim());
 
-  // WOMEN DOUBLE OUT 8:
-  // feste Turnierzeiten/Courts laut finalem Ablauf vom 16.09.2026.
-  // Dadurch gibt es keine fehlerhafte Zuordnung mehr über Schedule-Matchnummern.
   if(activeDoubleOutGender==="women"){
-    const womenMeta={
-      1:{time:"8.00 am",court:"C1"},
-      2:{time:"8.00 am",court:"C2"},
-      3:{time:"8.45 am",court:"C1"},
-      4:{time:"8.45 am",court:"C2"},
-      5:{time:"10.15 am",court:"C1"},
-      6:{time:"10.15 am",court:"C2"},
-      7:{time:"11.00 am",court:"C1"},
-      8:{time:"11.00 am",court:"C2"},
-      9:{time:"1.15 pm",court:"C1"},
-      10:{time:"1.15 pm",court:"C2"},
-      11:{time:"3.30 pm",court:"C1"},
-      12:{time:"",court:"C2"}
-    };
-    if(womenMeta[matchNo]) return womenMeta[matchNo];
+    return womenDoubleOutScheduleMeta(m);
   }
 
   // MEN DOUBLE OUT 16:
@@ -1182,40 +1197,10 @@ function resolveWomenDoubleOutTeam(name){
 function doMatchCard(m){
   let displayMatch=m.match;
 
-  if(activeDoubleOutGender==="women" && Number(String(m.match||"").trim())===11){
-    const source9=(dataStore.womenDoubleOut||[]).find(x=>Number(x.match)===7);
-    const source10=(dataStore.womenDoubleOut||[]).find(x=>Number(x.match)===8);
-
-    const winnerOfSource=source=>{
-      if(!source || !source.played) return "";
-      const r=String(source.result||"").trim();
-      if(!r.includes(":")) return "";
-      const p=r.split(":").map(Number);
-      if(p.length<2 || p.some(Number.isNaN) || p[0]===p[1]) return "";
-      return p[0]>p[1] ? source.team1 : source.team2;
-    };
-
-    const w9=winnerOfSource(source9);
-    const w10=winnerOfSource(source10);
-    m={...m,team1:w9||"Winner of match 9",team2:w10||"Winner of match 10"};
-  }
-
   if(activeDoubleOutGender==="women"){
-    // Die Excel-/JSON-Matchnummer bleibt intern unverändert, damit
-    // Winner/Loser-Verknüpfungen weiterhin auf das richtige Quellmatch zeigen.
-    // Nur die auf der Website sichtbare Nummer wird für den korrigierten Baum getauscht.
-    const womenDisplayMatch={7:9,8:10,9:7,10:8};
     const sourceMatchNo=Number(String(m.match||"").trim());
-    displayMatch=womenDisplayMatch[sourceMatchNo] || m.match;
-
-    // Match 11 refers to the NEW visible Match 9 and Match 10.
-    // Therefore its placeholders must not be resolved using the old internal numbers.
-    if(sourceMatchNo!==11){
-      m={...m,
-        team1:resolveWomenDoubleOutTeam(m.team1),
-        team2:resolveWomenDoubleOutTeam(m.team2)
-      };
-    }
+    if(sourceMatchNo===29) displayMatch=14;
+    if(sourceMatchNo===30) displayMatch=15;
   }
 
   const result=String(m.result||"").trim();
@@ -1281,6 +1266,65 @@ function renderDoubleOut(){
   let bracketSubtitle="";
   const board=document.getElementById("doubleOutBoard");
 
+
+  if(activeDoubleOutGender==="women"){
+    all=dataStore.womenDoubleOut;
+    bracketTitle="Women · Double Out 8";
+    bracketSubtitle="Rebuilt bracket from the current Excel tournament plan";
+
+    if(!Array.isArray(all)||!all.length){
+      board.innerHTML='<div class="empty-state">Bracket data is not available yet.</div>';
+      return;
+    }
+
+    const opening=matchesByNums(all,[1,2,3,4]);
+    const lower1=matchesByNums(all,[5,6]);
+    const upper2=matchesByNums(all,[7,8]);
+    const lower2=matchesByNums(all,[9,10]);
+    const match11=matchesByNums(all,[11]);
+    const semis=matchesByNums(all,[12,13]);
+    const bronze=matchesByNums(all,[29]);
+    const final=matchesByNums(all,[30]);
+
+    board.innerHTML=`
+      <div class="do-lane">
+        <div class="do-lane-title">${esc(bracketTitle)}</div>
+        <div class="do-help" style="margin:0 0 12px 0">${esc(bracketSubtitle)}</div>
+        <div class="do-flow">
+          ${doRound("Round 1",opening)}
+          <div class="do-arrow">›</div>
+          ${doRound("Losers Round 1",lower1)}
+          <div class="do-arrow">›</div>
+          ${doRound("Winners Round 2",upper2)}
+          <div class="do-arrow">›</div>
+          ${doRound("Losers Round 2",lower2)}
+          <div class="do-arrow">›</div>
+          ${doRound("Match 11",match11)}
+        </div>
+      </div>
+
+      <div class="do-lane">
+        <div class="do-lane-title">Final Four</div>
+        <div class="do-flow">
+          ${doRound("Semifinals",semis)}
+        </div>
+      </div>
+
+      <div class="do-lane">
+        <div class="do-lane-title">Medal Matches</div>
+        <div class="do-medals">
+          <div class="do-medal-card">
+            <div class="do-medal-label">🥉 Bronze Medal Match · Match 14</div>
+            ${bronze.map(doMatchCard).join("")}
+          </div>
+          <div class="do-medal-card final">
+            <div class="do-medal-label">🏆 Final · Match 15</div>
+            ${final.map(doMatchCard).join("")}
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
 
   if(activeMenBracket==="placement"){
     all=dataStore.menPlacementDoubleOut;
