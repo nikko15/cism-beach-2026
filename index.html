@@ -848,7 +848,7 @@ function renderSchedule(){
         row.time="11.00 am";
         row.court="CENTER 1";
         row.team1="Aljalboubi-Alhashmi [OMA]";
-        row.team2="Winner of match 25";
+        row.team2="Alshereiqi-Alhosni [OMA]";
         row.result="";
       }
 
@@ -858,10 +858,15 @@ function renderSchedule(){
         row.match="FINAL WOMEN - MATCH 30";
       }
 
-      // MEN 1/4 FINAL - MATCH 25 has not been played yet.
+      // MEN 1/4 FINAL - MATCH 25: result 2-0 for Alshereiqi-Alhosni.
       if(gender(row.gender)==="M" &&
          String(row.match||"").trim().toUpperCase()==="1/4 FINAL MEN - MATCH 25"){
-        row.result="";
+        const a=String(row.team1||"").replace(/\s*\[[^\]]+\]\s*$/,"").trim().toLowerCase();
+        const b=String(row.team2||"").replace(/\s*\[[^\]]+\]\s*$/,"").trim().toLowerCase();
+        if((a==="alshereiqi-alhosni" && b==="petraitis-jonusas") ||
+           (a==="petraitis-jonusas" && b==="alshereiqi-alhosni")){
+          row.result=(a==="alshereiqi-alhosni") ? "2-0" : "0-2";
+        }
       }
 
       return {
