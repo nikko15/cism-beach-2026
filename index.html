@@ -907,21 +907,22 @@ function renderSchedule(){
       if(gender(row.gender)==="W"){
         const wm=String(row.match||"").trim().toUpperCase();
 
-        if(wm==="3. PLACE WOMEN - MATCH 29"){
+        if(wm==="3. PLACE WOMEN - MATCH 29" || wm==="3. PLACE WOMEN - MATCH 14"){
           row.time="3.00 pm";
           row.court="CENTER COURT";
           row.team1="Chevalin-Schermann [FRA]";
-          row.team2="Loser of match 12";
+          row.team2="Smilgaite-Curukova [LTU]";
           row.result="";
+          row.match="3. PLACE WOMEN - MATCH 14";
         }
 
-        if(wm==="FINAL WOMEN - MATCH 30" || wm==="1. PLACE WOMEN - MATCH 30"){
+        if(wm==="FINAL WOMEN - MATCH 30" || wm==="1. PLACE WOMEN - MATCH 30" || wm==="FINAL WOMEN - MATCH 15"){
           row.time="4.00 pm";
           row.court="CENTER COURT";
           row.team1="Guignan-Descamps [FRA]";
-          row.team2="Winner of match 12";
+          row.team2="Schürholz-Ittlinger [GER]";
           row.result="";
-          row.match="FINAL WOMEN - MATCH 30";
+          row.match="FINAL WOMEN - MATCH 15";
         }
       }
 
