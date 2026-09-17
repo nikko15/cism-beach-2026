@@ -846,9 +846,9 @@ function renderSchedule(){
          gender(row.gender)==="M" &&
          String(row.match||"").trim().toUpperCase()==="1/2 FINAL MEN - MATCH 27"){
         row.time="11.00 am";
-        row.court="CENTER 1";
-        row.team1="Aljalboubi-Alhashmi [OMA]";
-        row.team2="Alshereiqi-Alhosni [OMA]";
+        row.court="CENTER COURT";
+        row.team1="Janiak-Jetke [POL]";
+        row.team2="Gabdullins-Eglitis [LAT]";
         row.result="";
       }
 
@@ -1293,8 +1293,8 @@ function doubleOutMatchMeta(m){
     if([25,26].includes(matchNo)) return {time:"8.00 am",court:doubleOutCourtFromSchedule(m)};
     if(matchNo===27) return {time:"11.00 am",court:doubleOutCourtFromSchedule(m)};
     if(matchNo===28) return {time:"12.00 am",court:doubleOutCourtFromSchedule(m)};
-    if(matchNo===29) return {time:"1.00 pm",court:doubleOutCourtFromSchedule(m)};
-    if(matchNo===30) return {time:"2.00 pm",court:doubleOutCourtFromSchedule(m)};
+    if(matchNo===29) return {time:"1.00 pm",court:"CC"};
+    if(matchNo===30) return {time:"2.00 pm",court:"CC"};
   }
 
   // Fallback: court/time assignment from Schedule & Results.
