@@ -872,6 +872,26 @@ function renderSchedule(){
         }
       }
 
+      // WOMEN medal matches: corrected team assignment.
+      if(gender(row.gender)==="W"){
+        const wm=String(row.match||"").trim().toUpperCase();
+
+        if(wm==="3. PLACE WOMEN - MATCH 29"){
+          const t1=String(row.team1||"").trim();
+          const t2=String(row.team2||"").trim();
+          if(/^LOSER OF MATCH (11|12)$/i.test(t1)) row.team1="Chevalin-Schermann [FRA]";
+          if(/^LOSER OF MATCH (11|12)$/i.test(t2)) row.team2="Chevalin-Schermann [FRA]";
+        }
+
+        if(wm==="FINAL WOMEN - MATCH 30" || wm==="1. PLACE WOMEN - MATCH 30"){
+          const t1=String(row.team1||"").trim();
+          const t2=String(row.team2||"").trim();
+          if(/^WINNER OF MATCH (11|12)$/i.test(t1)) row.team1="Guignan-Descamps [FRA]";
+          if(/^WINNER OF MATCH (11|12)$/i.test(t2)) row.team2="Guignan-Descamps [FRA]";
+          row.match="FINAL WOMEN - MATCH 30";
+        }
+      }
+
       // MEN 1/2 FINAL LOSER - MATCH 28 has not been played yet.
       if(gender(row.gender)==="M" &&
          String(row.match||"").trim().toUpperCase()==="1/2 FINAL LOSER - MATCH 28"){
