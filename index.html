@@ -858,6 +858,20 @@ function renderSchedule(){
         row.match="FINAL WOMEN - MATCH 30";
       }
 
+      // Thursday medal matches: MEN and WOMEN time slots swapped in Schedule & Results.
+      if((row.date || (index<72?"2026-09-15":index<144?"2026-09-16":"2026-09-17"))==="2026-09-17"){
+        const medalMatch=String(row.match||"").trim().toUpperCase();
+        const g=gender(row.gender);
+
+        if(g==="M" && medalMatch==="3. PLACE MEN - MATCH 29") row.time="1.00 pm";
+        if(g==="M" && medalMatch==="FINAL MEN - MATCH 30") row.time="2.00 pm";
+        if(g==="W" && medalMatch==="3. PLACE WOMEN - MATCH 29") row.time="3.00 pm";
+        if(g==="W" && (medalMatch==="FINAL WOMEN - MATCH 30" || medalMatch==="1. PLACE WOMEN - MATCH 30")){
+          row.time="4.00 pm";
+          row.match="FINAL WOMEN - MATCH 30";
+        }
+      }
+
       // MEN 1/2 FINAL LOSER - MATCH 28 has not been played yet.
       if(gender(row.gender)==="M" &&
          String(row.match||"").trim().toUpperCase()==="1/2 FINAL LOSER - MATCH 28"){
@@ -1279,8 +1293,8 @@ function doubleOutMatchMeta(m){
     if([25,26].includes(matchNo)) return {time:"8.00 am",court:doubleOutCourtFromSchedule(m)};
     if(matchNo===27) return {time:"11.00 am",court:doubleOutCourtFromSchedule(m)};
     if(matchNo===28) return {time:"12.00 am",court:doubleOutCourtFromSchedule(m)};
-    if(matchNo===29) return {time:"3.00 pm",court:doubleOutCourtFromSchedule(m)};
-    if(matchNo===30) return {time:"4.00 pm",court:doubleOutCourtFromSchedule(m)};
+    if(matchNo===29) return {time:"1.00 pm",court:doubleOutCourtFromSchedule(m)};
+    if(matchNo===30) return {time:"2.00 pm",court:doubleOutCourtFromSchedule(m)};
   }
 
   // Fallback: court/time assignment from Schedule & Results.
