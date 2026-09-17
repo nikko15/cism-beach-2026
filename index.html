@@ -858,6 +858,17 @@ function renderSchedule(){
         row.match="FINAL WOMEN - MATCH 30";
       }
 
+      // MEN 1/2 FINAL LOSER - MATCH 28 has not been played yet.
+      if(gender(row.gender)==="M" &&
+         String(row.match||"").trim().toUpperCase()==="1/2 FINAL LOSER - MATCH 28"){
+        const a=String(row.team1||"").replace(/\s*\[[^\]]+\]\s*$/,"").trim().toLowerCase();
+        const b=String(row.team2||"").replace(/\s*\[[^\]]+\]\s*$/,"").trim().toLowerCase();
+        if((a==="hoblos-minawiye" && b==="larquey-poize") ||
+           (a==="larquey-poize" && b==="hoblos-minawiye")){
+          row.result="";
+        }
+      }
+
       // MEN 1/4 FINAL - MATCH 25: result 2-0 for Alshereiqi-Alhosni.
       if(gender(row.gender)==="M" &&
          String(row.match||"").trim().toUpperCase()==="1/4 FINAL MEN - MATCH 25"){
