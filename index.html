@@ -872,22 +872,43 @@ function renderSchedule(){
         }
       }
 
-      // WOMEN medal matches: corrected team assignment.
+      // MEN Bronze Match 29: fixed public assignment.
+      if(gender(row.gender)==="M" &&
+         String(row.match||"").trim().toUpperCase()==="3. PLACE MEN - MATCH 29"){
+        row.time="1.00 pm";
+        row.court="CENTER COURT";
+        row.team1="Loser of match 27";
+        row.team2="Loser of match 28";
+        row.result="";
+      }
+
+      // MEN Final Match 30: fixed public assignment.
+      if(gender(row.gender)==="M" &&
+         String(row.match||"").trim().toUpperCase()==="FINAL MEN - MATCH 30"){
+        row.court="CENTER COURT";
+        row.team1="Winner of match 27";
+        row.team2="Winner of match 28";
+        row.result="";
+      }
+
+      // WOMEN medal matches: fixed public assignments.
       if(gender(row.gender)==="W"){
         const wm=String(row.match||"").trim().toUpperCase();
 
         if(wm==="3. PLACE WOMEN - MATCH 29"){
-          const t1=String(row.team1||"").trim();
-          const t2=String(row.team2||"").trim();
-          if(/^LOSER OF MATCH (11|12)$/i.test(t1)) row.team1="Chevalin-Schermann [FRA]";
-          if(/^LOSER OF MATCH (11|12)$/i.test(t2)) row.team2="Chevalin-Schermann [FRA]";
+          row.time="3.00 pm";
+          row.court="CENTER COURT";
+          row.team1="Chevalin-Schermann [FRA]";
+          row.team2="Loser of match 12";
+          row.result="";
         }
 
         if(wm==="FINAL WOMEN - MATCH 30" || wm==="1. PLACE WOMEN - MATCH 30"){
-          const t1=String(row.team1||"").trim();
-          const t2=String(row.team2||"").trim();
-          if(/^WINNER OF MATCH (11|12)$/i.test(t1)) row.team1="Guignan-Descamps [FRA]";
-          if(/^WINNER OF MATCH (11|12)$/i.test(t2)) row.team2="Guignan-Descamps [FRA]";
+          row.time="4.00 pm";
+          row.court="CENTER COURT";
+          row.team1="Guignan-Descamps [FRA]";
+          row.team2="Winner of match 12";
+          row.result="";
           row.match="FINAL WOMEN - MATCH 30";
         }
       }
