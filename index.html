@@ -891,6 +891,18 @@ function renderSchedule(){
         row.result="";
       }
 
+      // WOMEN semifinal: correct Match 28 label to Match 13 and set final result.
+      if(gender(row.gender)==="W" &&
+         String(row.match||"").trim().toUpperCase()==="1/2 FINAL WOMEN - MATCH 28"){
+        const a=String(row.team1||"").replace(/\s*\[[^\]]+\]\s*$/,"").trim().toLowerCase();
+        const b=String(row.team2||"").replace(/\s*\[[^\]]+\]\s*$/,"").trim().toLowerCase();
+        if((a==="schürholz-ittlinger" && b==="smilgaite-curukova") ||
+           (a==="smilgaite-curukova" && b==="schürholz-ittlinger")){
+          row.match="1/2 FINAL WOMEN - MATCH 13";
+          row.result=(a==="schürholz-ittlinger") ? "2-0" : "0-2";
+        }
+      }
+
       // WOMEN medal matches: fixed public assignments.
       if(gender(row.gender)==="W"){
         const wm=String(row.match||"").trim().toUpperCase();
