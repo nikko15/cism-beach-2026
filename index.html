@@ -926,14 +926,14 @@ function renderSchedule(){
         }
       }
 
-      // MEN 1/2 FINAL LOSER - MATCH 28 has not been played yet.
+      // MEN 1/2 FINAL LOSER - MATCH 28: Hoblos-Minawiye beat Larquey-Poize 2-0.
       if(gender(row.gender)==="M" &&
          String(row.match||"").trim().toUpperCase()==="1/2 FINAL LOSER - MATCH 28"){
         const a=String(row.team1||"").replace(/\s*\[[^\]]+\]\s*$/,"").trim().toLowerCase();
         const b=String(row.team2||"").replace(/\s*\[[^\]]+\]\s*$/,"").trim().toLowerCase();
         if((a==="hoblos-minawiye" && b==="larquey-poize") ||
            (a==="larquey-poize" && b==="hoblos-minawiye")){
-          row.result="";
+          row.result=(a==="hoblos-minawiye") ? "2-0" : "0-2";
         }
       }
 
