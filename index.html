@@ -1218,39 +1218,56 @@ function womenDoubleOutScheduleMeta(m){
 function doubleOutMatchMeta(m){
   const matchNo=Number(String(m.match||"").trim());
 
+  // WOMEN Double Out: Thursday times as assigned in Schedule & Results.
   if(activeDoubleOutGender==="women"){
-    return womenDoubleOutScheduleMeta(m);
+    const sourceNo=Number(String(m.match||"").trim());
+    const visibleNo=sourceNo===29 ? 14 : sourceNo===30 ? 15 : sourceNo;
+    const fixedWomenTimes={
+      12:"9.00 am",
+      13:"10.00 am",
+      14:"1.00 pm",
+      15:"2.00 pm"
+    };
+    const meta=womenDoubleOutScheduleMeta(m);
+    if(fixedWomenTimes[visibleNo]) meta.time=fixedWomenTimes[visibleNo];
+    return meta;
   }
 
   // MEN DOUBLE OUT 16:
-  // Matches 9–12 im Winners Bracket starten alle um 11.00 am.
+  // Matches 9–12 keep their existing tournament times.
   if(activeDoubleOutGender==="men" && [9,10,11,12].includes(matchNo)){
     const menCourts={9:"C1",10:"C2",11:"C1",12:"C2"};
     const menTime = activeMenBracket==="placement" ? "11.45 am" : "11.00 am";
     return {time:menTime,court:menCourts[matchNo]||""};
   }
 
-  // MEN Places 17–32 hat einen eigenen Zeitplan.
+  // MEN Places 17–32: existing Wednesday times.
   if(activeDoubleOutGender==="men" && activeMenBracket==="placement"){
     if([13,14,15,16].includes(matchNo)) return {time:"2.00 pm",court:doubleOutCourtFromSchedule(m)};
     if([17,18,19,20].includes(matchNo)) return {time:"3.30 pm",court:doubleOutCourtFromSchedule(m)};
     if([21,22,23,24].includes(matchNo)) return {time:"5.00 pm",court:doubleOutCourtFromSchedule(m)};
+
+    // Thursday · loser / placement tree
+    if([25,26].includes(matchNo)) return {time:"8.00 am",court:doubleOutCourtFromSchedule(m)};
+    if([27,28].includes(matchNo)) return {time:"10.00 am",court:doubleOutCourtFromSchedule(m)};
+    if([29,30].includes(matchNo)) return {time:"12.00 am",court:doubleOutCourtFromSchedule(m)};
   }
 
   // MEN Championship Bracket · Places 1–16
-  if(activeDoubleOutGender==="men" && activeMenBracket!=="placement" && [13,14,15,16].includes(matchNo)){
-    return {time:"1.15 pm",court:doubleOutCourtFromSchedule(m)};
+  if(activeDoubleOutGender==="men" && activeMenBracket!=="placement"){
+    if([13,14,15,16].includes(matchNo)) return {time:"1.15 pm",court:doubleOutCourtFromSchedule(m)};
+    if([17,18,19,20].includes(matchNo)) return {time:"2.45 pm",court:doubleOutCourtFromSchedule(m)};
+    if([21,22,23,24].includes(matchNo)) return {time:"4.15 pm",court:doubleOutCourtFromSchedule(m)};
+
+    // Thursday · winner / championship tree
+    if([25,26].includes(matchNo)) return {time:"8.00 am",court:doubleOutCourtFromSchedule(m)};
+    if(matchNo===27) return {time:"11.00 am",court:doubleOutCourtFromSchedule(m)};
+    if(matchNo===28) return {time:"12.00 am",court:doubleOutCourtFromSchedule(m)};
+    if(matchNo===29) return {time:"3.00 pm",court:doubleOutCourtFromSchedule(m)};
+    if(matchNo===30) return {time:"4.00 pm",court:doubleOutCourtFromSchedule(m)};
   }
 
-  if(activeDoubleOutGender==="men" && activeMenBracket!=="placement" && [17,18,19,20].includes(matchNo)){
-    return {time:"2.45 pm",court:doubleOutCourtFromSchedule(m)};
-  }
-
-  if(activeDoubleOutGender==="men" && activeMenBracket!=="placement" && [21,22,23,24].includes(matchNo)){
-    return {time:"4.15 pm",court:doubleOutCourtFromSchedule(m)};
-  }
-
-  // Alle übrigen MEN-Matches: Zuordnung aus Schedule & Results
+  // Fallback: court/time assignment from Schedule & Results.
   const matchText=String(m.match||"").trim();
   const matchRx=matchText ? new RegExp(`(?:MATCH\\s*)?${matchText}(?!\\d)`, "i") : null;
   const t1=normalizeScheduleTeam(m.team1);
